@@ -1,0 +1,21 @@
+app_def = {
+  "id": "demux-uhhpc",
+  "version": "0.0.2",
+  "description": "Paired-end reads demultiplexer",
+  "appType": "BATCH",
+  "runtime": "SINGULARITY",
+  "runtimeOptions": ["SINGULARITY_RUN"],
+  "containerImage": "replace with container image",
+  "jobAttributes": {
+    "parameterSet": {
+      "appArgs": [ { "arg": "--image_file",
+                       "meta": { "name": "arg1" } }
+      ],
+      "archiveFilter": { "includeLaunchFiles": False }
+    },
+    "nodeCount": 1,
+    "coresPerNode": 1,
+    "memoryMB": 1,
+    "maxMinutes": 10
+  }
+}

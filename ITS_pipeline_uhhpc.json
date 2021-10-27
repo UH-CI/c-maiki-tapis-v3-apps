@@ -1,0 +1,21 @@
+app_def = {
+  "id": "ITS-pipeline-uhhpc",
+  "version": "0.0.1",
+  "description": "Analysis pipeline for fungal ITS data",
+  "appType": "BATCH",
+  "runtime": "SINGULARITY",
+  "runtimeOptions": ["SINGULARITY_RUN"],
+  "containerImage": "needs to be replaced with container file",
+  "jobAttributes": {
+    "parameterSet": {
+      "appArgs": [ { "arg": "--image_file",
+                       "meta": { "name": "arg1" } }
+      ],
+      "archiveFilter": { "includeLaunchFiles": False }
+    },
+    "nodeCount": 1,
+    "coresPerNode": 1,
+    "memoryMB": 1,
+    "maxMinutes": 10
+  }
+}
