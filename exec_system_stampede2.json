@@ -1,0 +1,32 @@
+exec_system_stampede2 = {
+  "id": system_id_stampede2,
+  "description": "TACC Stampede2 System",
+  "systemType": "LINUX",
+  "host": "stampede2.tacc.utexas.edu",
+  "defaultAuthnMethod": "PASSWORD",
+  "port": 22,
+  "rootDir": "/",
+  "canExec": True,
+  "jobRuntimes": [ { "runtimeType": "SINGULARITY" } ],
+  "jobWorkingDir": "HOST_EVAL($WORK2)",
+  "jobIsBatch": True,
+  "batchScheduler": "SLURM",
+  "batchSchedulerProfile": "tacc",
+  "batchDefaultLogicalQueue": "tapisNormal",
+  "batchLogicalQueues": [
+    {
+      "name": "tapisNormal",
+      "hpcQueueName": "normal",
+      "maxJobs": 50,
+      "maxJobsPerUser": 10,
+      "minNodeCount": 1,
+      "maxNodeCount": 16,
+      "minCoresPerNode": 1,
+      "maxCoresPerNode": 68,
+      "minMemoryMB": 1,
+      "maxMemoryMB": 16384,
+      "minMinutes": 1,
+      "maxMinutes": 60
+    }
+  ]
+}
