@@ -1,4 +1,4 @@
-app_def = {
+{
   "id": "demux-uhhpc",
   "version": "0.0.2",
   "description": "Paired-end reads demultiplexer",

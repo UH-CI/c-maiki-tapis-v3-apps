@@ -1,4 +1,4 @@
-app_def = {
+{
   "id": "ITS-pipeline-uhhpc",
   "version": "0.0.1",
   "description": "Analysis pipeline for fungal ITS data",

@@ -1,4 +1,4 @@
-app_def = {
+{
   "id": "16S-pipeline-uhhpc",
   "version": "0.0.2",
   "description": "Analysis pipeline for bacterial 16S data",
