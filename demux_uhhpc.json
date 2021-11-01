@@ -11,7 +11,7 @@
       "appArgs": [ { "arg": "--image_file",
                        "meta": { "name": "arg1" } }
       ],
-      "archiveFilter": { "includeLaunchFiles": False }
+      "archiveFilter": { "includeLaunchFiles": false }
     },
     "nodeCount": 1,
     "coresPerNode": 1,
