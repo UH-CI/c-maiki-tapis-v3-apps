@@ -1,0 +1,6 @@
+# Create a python script to convert V2 parameters into V3 parameters json object
+# Figure out how to containerize application
+  - Use existing dockerfile
+# convert inputs into file_input
+  - input file should be in the form of a tapis uri
+

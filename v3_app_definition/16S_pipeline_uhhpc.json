@@ -1,0 +1,48 @@
+{
+  "id": "16S-pipeline-uhhpc",
+  "version": "1.0",
+  "description": "Analysis pipeline for bacterial 16S data",
+  "appType": "BATCH",
+  "runtime": "SINGULARITY",
+  "runtimeOptions": ["SINGULARITY_RUN"],
+  "containerImage": "need to be replaced with 16S container image",
+  "jobAttributes": {
+    "parameterSet": {
+      "appArgs": [ 
+        { 
+          "arg": "single_end",
+          "meta": { "name": "single_end" } 
+        },
+        { 
+          "arg": "trunc_fwd",
+          "meta": { "name": "trunc_fwd" } 
+        },
+        { 
+          "arg": "trunc_rev",
+          "meta": { "name": " trunc_rev"} 
+        },
+        { 
+          "arg": "min_read_len",
+          "meta": { "name": "min_read_len" } 
+        },
+        { 
+          "arg": "max_expected_error",
+          "meta": { "name": "max_expected_error" } 
+        },
+        { 
+          "arg": "min_overlap",
+          "meta": { "name": "min_overlap" } 
+        },
+        { 
+          "arg": "max_mismatch",
+          "meta": { "name": "max_mismatch" } 
+        }
+      ],
+      "archiveFilter": { "includeLaunchFiles": false }
+    },
+    "nodeCount": 1,
+    "coresPerNode": 1,
+    "memoryMB": 1,
+    "maxMinutes": 10
+  }
+}
