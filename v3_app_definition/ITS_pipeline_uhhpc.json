@@ -5,11 +5,53 @@
   "appType": "BATCH",
   "runtime": "SINGULARITY",
   "runtimeOptions": ["SINGULARITY_RUN"],
-  "containerImage": "needs to be replaced with container file",
+  "containerImage": "docker://jeffycwong/cmaiki-image:latest",
   "jobAttributes": {
     "parameterSet": {
-      "appArgs": [ { "arg": "--image_file",
-                       "meta": { "name": "arg1" } }
+      "fileInputs": [
+        {
+          "name": "reads",
+          "description": "Path to the folder containing reads (fastq.gz format)",
+          "sourceUrl": "test/data"
+        }
+      ],
+      "envVariables": [
+        {
+          "key": "locus",
+          "value": "ITS1"
+        },
+        {
+          "key": "paired_end",
+          "value": false
+        },
+        {
+          "key": "max_expected_error",
+          "value": 3
+        },
+        {
+          "key": "clustering_thresholds",
+          "value": "100,97"
+        },
+        {
+          "key": "skip_lulu",
+          "value": false
+        },
+        {
+          "key": "tax_confidence",
+          "value": 50
+        },
+        {
+          "key": "alpha_diversity",
+          "value": "nseqs-sobs-chao-shannon-shannoneven"
+        },
+        {
+          "key": "beta_diversity",
+          "value": "braycurtis-thetayc-sharedsobs-sharedchao"
+        },
+        {
+          "key": "is_test",
+          "value": false
+        }
       ],
       "archiveFilter": { "includeLaunchFiles": false }
     },
