@@ -1,0 +1,8 @@
+locus='ITS1'
+minQuality=25
+minPercentWithHighQuality=90
+taxaMinIdentityThreshold=0.5
+clusteringThresholds=100,97
+isTest=1
+pairedEnd=0
+reads=test
