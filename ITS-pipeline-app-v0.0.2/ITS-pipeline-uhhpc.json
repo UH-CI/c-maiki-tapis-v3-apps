@@ -1,0 +1,73 @@
+{
+  "id": app_id,
+  "version": "0.0.1",
+  "description": "Analysis pipeline for fungal ITS data",
+  "jobType": "BATCH",
+  "runtime": "SINGULARITY",
+  "runtimeOptions": ["SINGULARITY_RUN"],
+  "containerImage": "docker://jeffycwong/cmaiki-image:latest",
+  "jobAttributes": {
+    "fileInputs": [
+#         {
+#           "name": "reads",
+#           "description": "Path to the folder containing reads (fastq.gz format)",
+#           "sourceUrl": "tapis://dev-vm-wongy/volume_b/ITS-pipeline-app-v0.0.2/Makefile",
+#           "targetPath": "/Makefile"
+#         }
+        {
+            "name": "container",
+            "description": "container files",
+            "sourceUrl": "tapislocal://exec.tapis/cmaiki/ITS-pipeline-app-v0.0.2/container",
+            "targetPath": “*”
+        }
+    ],
+    "parameterSet": {
+        "containerArgs": [
+#             {"name": "debug", "include": True, "arg": "-d"},
+            {"name": "bind", "inputMode": "INCLUDE_BY_DEFAULT","arg": "--bind ./output:/output"},
+#             {"name": "pwd","inputMode": "INCLUDE_BY_DEFAULT", "arg": "--pwd /envworkspace"},
+            {"name": "user namespace", "inputMode": "INCLUDE_BY_DEFAULT", "arg": "--userns"},
+#             {"name": "writable", "inputMode": "INCLUDE_BY_DEFAULT", "arg": "--writable"}
+        ],
+        "schedulerOptions": [
+            {"name": "profile", "inputMode": "INCLUDE_BY_DEFAULT","arg": "--tapis-profile MANA"},
+            
+        ],
+      "envVariables": [
+        {
+          "key": "locus",
+          "value": "'ITS1'"
+        },
+        {
+          "key": "pairedEnd",
+          "value": "0"
+        },
+        {
+          "key": "minQuality",
+          "value": "25"
+        },
+        {
+          "key": "clustering_thresholds",
+          "value": "100-97"
+        },
+        {
+          "key": "minPercentWithHighQuality",
+          "value": "90"
+        },
+        {
+          "key": "taxaMinIdentityThreshold",
+          "value": "0.5"
+        },
+        {
+          "key": "isTest",
+          "value": "0"
+        }
+      ],
+      "archiveFilter": { "includeLaunchFiles": False }
+    },
+    "nodeCount": 1,
+    "coresPerNode": 8,
+    "memoryMB": 20000,
+    "maxMinutes": 4320
+  }
+}
