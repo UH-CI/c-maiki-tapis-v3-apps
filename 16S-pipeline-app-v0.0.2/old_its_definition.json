@@ -1,0 +1,495 @@
+{
+		"id": "16S-pipeline-uhhpc-0.0.2",
+		"name": "16S-pipeline-uhhpc",
+		"icon": null,
+		"uuid": "3844258514164453866-242ac116-0001-005",
+		"parallelism": "SERIAL",
+		"defaultProcessorsPerNode": 1,
+		"defaultMemoryPerNode": 16,
+		"defaultNodeCount": 1,
+		"defaultMaxRunTime": "720:00:00",
+		"defaultQueue": "cmaiki",
+		"version": "0.0.2",
+		"revision": 6,
+		"isPublic": false,
+		"helpURI": "https://metagenomics-pipelines.readthedocs.io/en/latest/pipeline_16S.html",
+		"label": "Run 16S pipeline",
+		"owner": "carisdak",
+		"shortDescription": "Analysis pipeline for bacterial 16S data",
+		"longDescription": "Analysis pipeline for bacterial 16S data",
+		"tags": ["16S", "metagenomics", "C-MAIKI"],
+		"ontology": [],
+		"executionType": "HPC",
+		"executionSystem": "agave-new-uhhpc-execution",
+		"deploymentPath": "16S-pipeline-app-v0.0.2",
+		"deploymentSystem": "cmaiki-apps-deploy-storage",
+		"templatePath": "wrapper.sh",
+		"testPath": "test/test.sh",
+		"checkpointable": false,
+		"lastModified": "2022-01-07T14:18:14.000-06:00",
+		"modules": [],
+		"available": true,
+		"inputs": [{
+			"id": "reads",
+			"value": {
+				"validator": null,
+				"visible": true,
+				"required": true,
+				"order": 0,
+				"enquote": false,
+				"default": "test/data"
+			},
+			"details": {
+				"label": "Path to the folder containing reads (fastq.gz format)",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 1,
+				"maxCardinality": 1,
+				"ontology": [],
+				"fileTypes": []
+			}
+		}],
+		"parameters": [{
+			"id": "singleEnd",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "bool",
+				"order": 0,
+				"enquote": false,
+				"default": false,
+				"validator": null
+			},
+			"details": {
+				"label": "Single-end",
+				"description": null,
+				"argument": "",
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "truncationFwd",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 220,
+				"validator": null
+			},
+			"details": {
+				"label": "Where do you want to truncate the forward read?",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "truncationRev",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 190,
+				"validator": null
+			},
+			"details": {
+				"label": "Where do you want to truncate the reverse read?",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "minReadLength",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 20,
+				"validator": null
+			},
+			"details": {
+				"label": "Minimum read length for filtering",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "maxExpectedError",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 3,
+				"validator": null
+			},
+			"details": {
+				"label": "Maximum number of expected errors per read (> 0)",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "minOverlapMerging",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 20,
+				"validator": null
+			},
+			"details": {
+				"label": "Minimum overlap for merging reads into contigs",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "maxMismatchMerging",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 1,
+				"validator": null
+			},
+			"details": {
+				"label": "Number of allowed mismatches between forward and reverse read when merging",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "minAbundanceFilter",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 2,
+				"validator": null
+			},
+			"details": {
+				"label": "Minimum OTU abundance",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "clusteringThresholds",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "string",
+				"order": 0,
+				"enquote": false,
+				"default": "100,97",
+				"validator": null
+			},
+			"details": {
+				"label": "Sequence similarity thresholds for OTU clustering (comma separated)",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": -1,
+				"ontology": []
+			}
+		}, {
+			"id": "skipSubsampling",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "bool",
+				"order": 0,
+				"enquote": false,
+				"default": false,
+				"validator": null
+			},
+			"details": {
+				"label": "Skip subsampling?",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "customSubsamplingLevel",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 0,
+				"validator": null
+			},
+			"details": {
+				"label": "Exact subsampling level (overrides the next 2 parameters if set)",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "minSubsampling",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "number",
+				"order": 0,
+				"enquote": false,
+				"default": 5000,
+				"validator": null
+			},
+			"details": {
+				"label": "Minimum number of sequence for subsampling. Used if the automatic subsampling level falls below this value",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "subsamplingQuantile",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "string",
+				"order": 0,
+				"enquote": false,
+				"default": "0.1",
+				"validator": null
+			},
+			"details": {
+				"label": "Automatic subsampling threshold (quantile of the sample sizes distributions). Ignored if an exact subsampling level is chosen",
+				"description": "Number between 0 and 1",
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "removeUnknown",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "bool",
+				"order": 0,
+				"enquote": false,
+				"default": true,
+				"validator": null
+			},
+			"details": {
+				"label": "Remove unknown OTUs (at the domain level)?",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 1,
+				"maxCardinality": 1,
+				"ontology": []
+			}
+		}, {
+			"id": "removeChloroplasts",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "bool",
+				"order": 0,
+				"enquote": false,
+				"default": true,
+				"validator": null
+			},
+			"details": {
+				"label": "Remove chloroplasts?",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": -1,
+				"ontology": []
+			}
+		}, {
+			"id": "removeMitochondria",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "bool",
+				"order": 0,
+				"enquote": false,
+				"default": true,
+				"validator": null
+			},
+			"details": {
+				"label": "Remove mitochondria?",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": -1,
+				"ontology": []
+			}
+		}, {
+			"id": "taxaToFilter",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "string",
+				"order": 0,
+				"enquote": false,
+				"default": "\"\"",
+				"validator": null
+			},
+			"details": {
+				"label": "Experimental: Other taxa to filter? (Mothur syntax with commas instead of semicolons)",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 1,
+				"maxCardinality": -1,
+				"ontology": []
+			}
+		}, {
+			"id": "isTest",
+			"value": {
+				"visible": true,
+				"required": false,
+				"type": "bool",
+				"order": 0,
+				"enquote": false,
+				"default": false,
+				"validator": null
+			},
+			"details": {
+				"label": "This is a test",
+				"description": null,
+				"argument": null,
+				"showArgument": false,
+				"repeatArgument": false
+			},
+			"semantics": {
+				"minCardinality": 0,
+				"maxCardinality": -1,
+				"ontology": []
+			}
+		}],
+		"outputs": [],
+		"_links": {
+			"self": {
+				"href": "https://uhhpctenant.its.hawaii.edu/apps/v2/16S-pipeline-uhhpc-0.0.2"
+			},
+			"executionSystem": {
+				"href": "https://uhhpctenant.its.hawaii.edu/systems/v2/agave-new-uhhpc-execution"
+			},
+			"storageSystem": {
+				"href": "https://uhhpctenant.its.hawaii.edu/systems/v2/cmaiki-apps-deploy-storage"
+			},
+			"history": {
+				"href": "https://uhhpctenant.its.hawaii.edu/apps/v2/16S-pipeline-uhhpc-0.0.2/history"
+			},
+			"metadata": {
+				"href": "https://uhhpctenant.its.hawaii.edu/meta/v2/data/?q=%7B%22associationIds%22%3A%223844258514164453866-242ac116-0001-005%22%7D"
+			},
+			"owner": {
+				"href": "https://uhhpctenant.its.hawaii.edu/profiles/v2/carisdak"
+			},
+			"permissions": {
+				"href": "https://uhhpctenant.its.hawaii.edu/apps/v2/16S-pipeline-uhhpc-0.0.2/pems"
+			}
+		}
+}
