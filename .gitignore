@@ -1,2 +1,4 @@
 container/singularity_images.cache/
 container/databases.tar.gz
+local_container/singularity_images.cache/
+local_container/databases.tar.gz
