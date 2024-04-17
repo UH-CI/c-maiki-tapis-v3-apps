@@ -1,0 +1,152 @@
+Feb-16 03:58:16.552 [main] DEBUG nextflow.cli.Launcher - $> nextflow run src/main.nf --reads './test/*_R1' -profile hpc --locus ITS1 --max_expected_error 3 --tax_confidence 50 --clustering_thresholds 100,97 --alpha_diversity nseqs-sobs-chao-shannon-shannoneven --beta_diversity braycurtis-thetayc-sharedsobs-sharedchao
+Feb-16 03:58:16.690 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 21.04.1
+Feb-16 03:58:16.720 [main] INFO  nextflow.cli.CmdRun - Launching `src/main.nf` [small_darwin] - revision: ed2d587af0
+Feb-16 03:58:16.736 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /home/andyyu/apps/ITS-pipeline-app-v2.0/src/nextflow.config
+Feb-16 03:58:16.738 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/andyyu/apps/ITS-pipeline-app-v2.0/src/nextflow.config
+Feb-16 03:58:16.764 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `hpc`
+Feb-16 03:58:17.735 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [hpc_test, local_test, gcp, hpc, local]
+Feb-16 03:58:17.774 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/andyyu/apps/ITS-pipeline-app-v2.0/.nextflow/plugins
+Feb-16 03:58:17.775 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Feb-16 03:58:17.778 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins local root: .nextflow/plr/empty
+Feb-16 03:58:17.788 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Feb-16 03:58:17.789 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Feb-16 03:58:17.794 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Feb-16 03:58:17.806 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Feb-16 03:58:17.807 [main] DEBUG nextflow.plugin.PluginsFacade - Plugin 'start' is not required in self-contained mode -- ignoring it for plugins: []
+Feb-16 03:58:17.861 [main] DEBUG nextflow.Session - Session uuid: 40a50a1a-6b07-41a9-bb9b-a3f5f3f8e726
+Feb-16 03:58:17.861 [main] DEBUG nextflow.Session - Run name: small_darwin
+Feb-16 03:58:17.863 [main] DEBUG nextflow.Session - Executor pool size: 4
+Feb-16 03:58:17.910 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 21.04.1 build 5557
+  Created: 14-05-2021 16:49 UTC 
+  System: Linux 5.14.0-362.18.1.el9_3.x86_64
+  Runtime: Groovy 3.0.7 on OpenJDK 64-Bit Server VM 11.0.18+10
+  Encoding: UTF-8 (UTF-8)
+  Process: 2797700@cn-03-13-01 [10.3.13.1]
+  CPUs: 4 - Mem: 125.8 GB (69.8 GB) - Swap: 0 (0)
+Feb-16 03:58:17.942 [main] DEBUG nextflow.Session - Work-dir: /home/andyyu/apps/ITS-pipeline-app-v2.0/work [nfs]
+Feb-16 03:58:17.943 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/andyyu/apps/ITS-pipeline-app-v2.0/src/bin
+Feb-16 03:58:17.994 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[GoogleLifeSciencesExecutor, AwsBatchExecutor, IgExecutor]
+Feb-16 03:58:18.008 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Feb-16 03:58:18.156 [main] DEBUG nextflow.Session - Session start invoked
+Feb-16 03:58:18.764 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Feb-16 03:58:22.346 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: VSEARCH_CLUSTER, DOWNLOAD_RDP_FOR_DADA2, DADA2_FILTERANDTRIM, BUILD_ASV_TABLE, FASTTREE, DADA2_LEARNERRORS, MOTHUR_SUMMARY_SINGLE, VSEARCH_USEARCH_GLOBAL, CONVERT_TO_MOTHUR_FORMAT, ITSXPRESS, DADA2_ASSIGN_TAXONOMY, DADA2_DEREPFASTQ, VSEARCH_CHIMERA, DOWNLOAD_SILVA_FOR_MOTHUR, SUBSET_READS_RDS, MOTHUR_SUMMARY_SHARED, HOLOVIEWS_PREPARE, HOLOVIEWS_CLUSTERMAP, SUMMARIZE_TABLE, DOWNLOAD_UNITE, GET_SUBSAMPLING_THRESHOLD, HOLOVIEWS_BARS, PHYLOSEQ_UNIFRAC, LULU, READ_TRACKING, DADA2_MERGEPAIRS, DADA2_DADA, HOLOVIEWS_SCATTER
+Feb-16 03:58:22.566 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:ITSXPRESS
+Feb-16 03:58:22.573 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.574 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.583 [main] DEBUG nextflow.executor.Executor - [warm up] executor > slurm
+Feb-16 03:58:22.589 [main] DEBUG n.processor.TaskPollingMonitor - Creating task monitor for executor 'slurm' > capacity: 40; pollInterval: 5s; dumpInterval: 5m 
+Feb-16 03:58:22.596 [main] DEBUG n.executor.AbstractGridExecutor - Creating executor 'slurm' > queue-stat-interval: 1m
+Feb-16 03:58:22.678 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:DADA2_FILTERANDTRIM
+Feb-16 03:58:22.679 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.679 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.686 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:DADA2_DEREPFASTQ
+Feb-16 03:58:22.688 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.688 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.695 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches label `process_high` for process with name pipeline_ITS:dada2:VSEARCH_CHIMERA
+Feb-16 03:58:22.696 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.696 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.710 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:SUBSET_READS_RDS
+Feb-16 03:58:22.711 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.712 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.723 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:dada2:DADA2_LEARNERRORS
+Feb-16 03:58:22.725 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.725 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.736 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:dada2:DADA2_DADA
+Feb-16 03:58:22.738 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.738 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.751 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:dada2:BUILD_ASV_TABLE
+Feb-16 03:58:22.752 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.752 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.761 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:SUMMARIZE_TABLE
+Feb-16 03:58:22.763 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.763 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.780 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches label `process_high` for process with name pipeline_ITS:VSEARCH_CLUSTER
+Feb-16 03:58:22.793 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.793 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.795 [main] DEBUG nextflow.processor.TaskProcessor - Creating *combiner* operator for each param(s) at index(es): [1]
+Feb-16 03:58:22.813 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:SUMMARIZE_TABLE
+Feb-16 03:58:22.814 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.814 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.819 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches label `process_high` for process with name pipeline_ITS:VSEARCH_USEARCH_GLOBAL
+Feb-16 03:58:22.820 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.820 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.829 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches label `process_high` for process with name pipeline_ITS:LULU
+Feb-16 03:58:22.830 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:FAST_TREE|PHYLOSEQ_UNIFRAC|LULU` matches process pipeline_ITS:LULU
+Feb-16 03:58:22.831 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.832 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.837 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:DOWNLOAD_UNITE
+Feb-16 03:58:22.838 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.838 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.845 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches label `process_high` for process with name pipeline_ITS:DADA2_ASSIGN_TAXONOMY
+Feb-16 03:58:22.846 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.847 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.879 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:READ_TRACKING
+Feb-16 03:58:22.881 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.881 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.890 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:CONVERT_TO_MOTHUR_FORMAT
+Feb-16 03:58:22.892 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.892 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.898 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:diversity:MOTHUR_SUMMARY_SINGLE
+Feb-16 03:58:22.899 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.899 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.902 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:diversity:MOTHUR_SUMMARY_SHARED
+Feb-16 03:58:22.903 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.903 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.909 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:holoviews:HOLOVIEWS_PREPARE
+Feb-16 03:58:22.909 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:plot` matches label `plot` for process with name pipeline_ITS:holoviews:HOLOVIEWS_PREPARE
+Feb-16 03:58:22.910 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.911 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.915 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:holoviews:HOLOVIEWS_BARS
+Feb-16 03:58:22.916 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:plot` matches label `plot` for process with name pipeline_ITS:holoviews:HOLOVIEWS_BARS
+Feb-16 03:58:22.916 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.917 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.921 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:holoviews:HOLOVIEWS_SCATTER
+Feb-16 03:58:22.922 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:plot` matches label `plot` for process with name pipeline_ITS:holoviews:HOLOVIEWS_SCATTER
+Feb-16 03:58:22.923 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.923 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.927 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:holoviews:HOLOVIEWS_CLUSTERMAP
+Feb-16 03:58:22.927 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:plot` matches label `plot` for process with name pipeline_ITS:holoviews:HOLOVIEWS_CLUSTERMAP
+Feb-16 03:58:22.928 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:58:22.928 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:58:22.931 [main] DEBUG nextflow.extension.CH - Bridging dataflow queue=DataflowQueue(queue=[])
+Feb-16 03:58:22.934 [main] DEBUG nextflow.extension.CH - Bridging dataflow queue=DataflowQueue(queue=[])
+Feb-16 03:58:22.934 [main] DEBUG nextflow.Session - Ignite dataflow network (27)
+Feb-16 03:58:22.941 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: ./test/; pattern: *_R1; options: [:]
+Feb-16 03:58:22.948 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:ITSXPRESS
+Feb-16 03:58:22.953 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:DADA2_FILTERANDTRIM
+Feb-16 03:58:22.958 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:DADA2_DEREPFASTQ
+Feb-16 03:58:22.959 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:VSEARCH_CHIMERA
+Feb-16 03:58:22.960 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:SUBSET_READS_RDS
+Feb-16 03:58:22.960 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:DADA2_LEARNERRORS
+Feb-16 03:58:22.961 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:DADA2_DADA
+Feb-16 03:58:22.961 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:BUILD_ASV_TABLE
+Feb-16 03:58:22.963 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:dada2:SUMMARIZE_TABLE
+Feb-16 03:58:22.963 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:VSEARCH_CLUSTER
+Feb-16 03:58:22.965 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:VSEARCH_CLUSTER
+Feb-16 03:58:22.969 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:SUMMARIZE_TABLE
+Feb-16 03:58:22.973 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:VSEARCH_USEARCH_GLOBAL
+Feb-16 03:58:22.974 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:LULU
+Feb-16 03:58:22.974 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:DOWNLOAD_UNITE
+Feb-16 03:58:22.977 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:DADA2_ASSIGN_TAXONOMY
+Feb-16 03:58:22.978 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:READ_TRACKING
+Feb-16 03:58:22.978 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:CONVERT_TO_MOTHUR_FORMAT
+Feb-16 03:58:22.986 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:diversity:MOTHUR_SUMMARY_SINGLE
+Feb-16 03:58:22.986 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:diversity:MOTHUR_SUMMARY_SHARED
+Feb-16 03:58:22.986 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:holoviews:HOLOVIEWS_PREPARE
+Feb-16 03:58:22.987 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:holoviews:HOLOVIEWS_BARS
+Feb-16 03:58:22.988 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:holoviews:HOLOVIEWS_SCATTER
+Feb-16 03:58:22.988 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > pipeline_ITS:holoviews:HOLOVIEWS_CLUSTERMAP
+Feb-16 03:58:22.989 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
+Feb-16 03:58:22.989 [main] DEBUG nextflow.Session - Session await
+Feb-16 03:58:22.985 [Actor Thread 3] DEBUG nextflow.file.SortFileCollector - FileCollector temp dir not removed: null
+Feb-16 03:58:23.016 [Actor Thread 8] DEBUG nextflow.file.SortFileCollector - FileCollector temp dir not removed: null
+Feb-16 03:58:23.069 [Actor Thread 3] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=docker://nakor/bash:5.1.4; path=/home/andyyu/apps/ITS-pipeline-app-v2.0/singularity_images.cache/nakor-bash-5.1.4.img
+Feb-16 03:58:23.227 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process pipeline_ITS:DOWNLOAD_UNITE (fungi) > jobId: 1285593; workDir: /home/andyyu/apps/ITS-pipeline-app-v2.0/work/4a/6a589c3c9bdd03e95cf32c0bf56a86
+Feb-16 03:58:23.232 [Task submitter] INFO  nextflow.Session - [4a/6a589c] Submitted process > pipeline_ITS:DOWNLOAD_UNITE (fungi)
+Feb-16 03:58:57.605 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 1285593; id: 1; name: pipeline_ITS:DOWNLOAD_UNITE (fungi); status: COMPLETED; exit: 0; error: -; workDir: /home/andyyu/apps/ITS-pipeline-app-v2.0/work/4a/6a589c3c9bdd03e95cf32c0bf56a86 started: 1708055907601; exited: 2024-02-16T03:58:40.938638Z; ]
+Feb-16 03:58:57.618 [main] DEBUG nextflow.Session - Session await > all process finished
+Feb-16 03:58:57.621 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Feb-16 03:58:57.634 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=1; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=3m; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=6; peakMemory=32 GB; ]
+Feb-16 03:58:57.853 [main] DEBUG nextflow.CacheDB - Closing CacheDB done
+Feb-16 03:58:57.873 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

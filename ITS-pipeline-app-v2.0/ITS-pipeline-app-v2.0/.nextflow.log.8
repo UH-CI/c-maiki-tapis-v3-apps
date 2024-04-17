@@ -1,0 +1,137 @@
+Feb-16 03:53:49.159 [main] DEBUG nextflow.cli.Launcher - $> nextflow run src/main.nf --reads '/home/andyyu/apps/ITS-pipeline-app-v2.0/.tar/reads/*_R1' -profile hpc --locus --max_expected_error --tax_confidence --clustering_thresholds --alpha_diversity --beta_diversity
+Feb-16 03:53:49.289 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 21.04.1
+Feb-16 03:53:49.316 [main] INFO  nextflow.cli.CmdRun - Launching `src/main.nf` [tender_boyd] - revision: ed2d587af0
+Feb-16 03:53:49.331 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /home/andyyu/apps/ITS-pipeline-app-v2.0/src/nextflow.config
+Feb-16 03:53:49.333 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/andyyu/apps/ITS-pipeline-app-v2.0/src/nextflow.config
+Feb-16 03:53:49.358 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `hpc`
+Feb-16 03:53:50.303 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [hpc_test, local_test, gcp, hpc, local]
+Feb-16 03:53:50.339 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/andyyu/apps/ITS-pipeline-app-v2.0/.nextflow/plugins
+Feb-16 03:53:50.341 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Feb-16 03:53:50.343 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins local root: .nextflow/plr/empty
+Feb-16 03:53:50.352 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Feb-16 03:53:50.353 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Feb-16 03:53:50.358 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Feb-16 03:53:50.369 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Feb-16 03:53:50.370 [main] DEBUG nextflow.plugin.PluginsFacade - Plugin 'start' is not required in self-contained mode -- ignoring it for plugins: []
+Feb-16 03:53:50.422 [main] DEBUG nextflow.Session - Session uuid: 72842acf-1008-4271-b91b-dab2330eda57
+Feb-16 03:53:50.423 [main] DEBUG nextflow.Session - Run name: tender_boyd
+Feb-16 03:53:50.423 [main] DEBUG nextflow.Session - Executor pool size: 4
+Feb-16 03:53:50.464 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 21.04.1 build 5557
+  Created: 14-05-2021 16:49 UTC 
+  System: Linux 5.14.0-362.18.1.el9_3.x86_64
+  Runtime: Groovy 3.0.7 on OpenJDK 64-Bit Server VM 11.0.18+10
+  Encoding: UTF-8 (UTF-8)
+  Process: 2768358@cn-03-13-01 [10.3.13.1]
+  CPUs: 4 - Mem: 125.8 GB (72.3 GB) - Swap: 0 (0)
+Feb-16 03:53:50.490 [main] DEBUG nextflow.Session - Work-dir: /home/andyyu/apps/ITS-pipeline-app-v2.0/work [nfs]
+Feb-16 03:53:50.490 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/andyyu/apps/ITS-pipeline-app-v2.0/src/bin
+Feb-16 03:53:50.536 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[GoogleLifeSciencesExecutor, AwsBatchExecutor, IgExecutor]
+Feb-16 03:53:50.549 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Feb-16 03:53:50.692 [main] DEBUG nextflow.Session - Session start invoked
+Feb-16 03:53:51.329 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Feb-16 03:53:54.685 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: VSEARCH_CLUSTER, DOWNLOAD_RDP_FOR_DADA2, DADA2_FILTERANDTRIM, BUILD_ASV_TABLE, FASTTREE, DADA2_LEARNERRORS, MOTHUR_SUMMARY_SINGLE, VSEARCH_USEARCH_GLOBAL, CONVERT_TO_MOTHUR_FORMAT, ITSXPRESS, DADA2_DEREPFASTQ, DADA2_ASSIGN_TAXONOMY, VSEARCH_CHIMERA, DOWNLOAD_SILVA_FOR_MOTHUR, SUBSET_READS_RDS, MOTHUR_SUMMARY_SHARED, HOLOVIEWS_PREPARE, HOLOVIEWS_CLUSTERMAP, SUMMARIZE_TABLE, GET_SUBSAMPLING_THRESHOLD, DOWNLOAD_UNITE, HOLOVIEWS_BARS, PHYLOSEQ_UNIFRAC, LULU, READ_TRACKING, DADA2_MERGEPAIRS, DADA2_DADA, HOLOVIEWS_SCATTER
+Feb-16 03:53:54.885 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:ITSXPRESS
+Feb-16 03:53:54.892 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:54.892 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:54.899 [main] DEBUG nextflow.executor.Executor - [warm up] executor > slurm
+Feb-16 03:53:54.906 [main] DEBUG n.processor.TaskPollingMonitor - Creating task monitor for executor 'slurm' > capacity: 40; pollInterval: 5s; dumpInterval: 5m 
+Feb-16 03:53:54.915 [main] DEBUG n.executor.AbstractGridExecutor - Creating executor 'slurm' > queue-stat-interval: 1m
+Feb-16 03:53:54.988 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:DADA2_FILTERANDTRIM
+Feb-16 03:53:54.989 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:54.989 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:54.996 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:DADA2_DEREPFASTQ
+Feb-16 03:53:54.997 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:54.998 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:55.004 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches label `process_high` for process with name pipeline_ITS:dada2:VSEARCH_CHIMERA
+Feb-16 03:53:55.005 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:55.005 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:55.018 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:SUBSET_READS_RDS
+Feb-16 03:53:55.019 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:55.019 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:55.029 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:dada2:DADA2_LEARNERRORS
+Feb-16 03:53:55.030 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:55.030 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:55.041 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:dada2:DADA2_DADA
+Feb-16 03:53:55.042 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:55.042 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:55.054 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches label `process_medium` for process with name pipeline_ITS:dada2:BUILD_ASV_TABLE
+Feb-16 03:53:55.055 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:55.055 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:55.062 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches label `process_low` for process with name pipeline_ITS:dada2:SUMMARIZE_TABLE
+Feb-16 03:53:55.063 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Feb-16 03:53:55.063 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Feb-16 03:53:55.081 [main] DEBUG nextflow.Session - Session aborted -- Cause: Missing process or function with name 'split'
+Feb-16 03:53:55.102 [main] DEBUG nextflow.Session - The following nodes are still active:
+  [operator] map
+  [operator] map
+  [operator] filter
+  [operator] map
+  [operator] join
+  [operator] mix
+  [operator] join
+  [operator] collect
+  [operator] map
+  [operator] mix
+  [operator] mix
+  [operator] mix
+
+Feb-16 03:53:55.125 [main] ERROR nextflow.cli.Launcher - @unknown
+nextflow.exception.MissingProcessException: Missing process or function with name 'split'
+	at nextflow.script.WorkflowDef.run(WorkflowDef.groovy:173)
+	at nextflow.script.BindableDef.invoke_a(BindableDef.groovy:52)
+	at nextflow.script.ComponentDef.invoke_o(ComponentDef.groovy:41)
+	at nextflow.script.WorkflowBinding.invokeMethod(WorkflowBinding.groovy:95)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeOnDelegationObjects(ClosureMetaClass.java:397)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:339)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.callCurrent(PogoMetaClassSite.java:61)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallCurrent(CallSiteArray.java:51)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:171)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:185)
+	at Script_c83e18fc$_runScript_closure2$_closure15.doCall(Script_c83e18fc:125)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:263)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1035)
+	at groovy.lang.Closure.call(Closure.java:412)
+	at groovy.lang.Closure.call(Closure.java:406)
+	at nextflow.script.WorkflowDef.run0(WorkflowDef.groovy:186)
+	at nextflow.script.WorkflowDef.run(WorkflowDef.groovy:170)
+	at nextflow.script.BindableDef.invoke_a(BindableDef.groovy:52)
+	at nextflow.script.ChainableDef$invoke_a.call(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:139)
+	at nextflow.script.BaseScript.runDsl2(BaseScript.groovy:191)
+	at nextflow.script.BaseScript.run(BaseScript.groovy:200)
+	at nextflow.script.ScriptParser.runScript(ScriptParser.groovy:221)
+	at nextflow.script.ScriptRunner.run(ScriptRunner.groovy:212)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:120)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:302)
+	at nextflow.cli.Launcher.run(Launcher.groovy:475)
+	at nextflow.cli.Launcher.main(Launcher.groovy:657)
+Caused by: groovy.lang.MissingMethodException: No signature of method: java.lang.Boolean.split() is applicable for argument types: (String) values: [,]
+Possible solutions: split(groovy.lang.Closure), wait(), wait(long), sprintf(java.lang.String, java.lang.Object), print(java.lang.Object), sprintf(java.lang.String, [Ljava.lang.Object;)
+	at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.unwrap(ScriptBytecodeAdapter.java:70)
+	at org.codehaus.groovy.runtime.callsite.PojoMetaClassSite.call(PojoMetaClassSite.java:46)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:139)
+	at Script_c83e18fc$_runScript_closure1$_closure3.doCall(Script_c83e18fc:60)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:263)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1035)
+	at groovy.lang.Closure.call(Closure.java:412)
+	at groovy.lang.Closure.call(Closure.java:406)
+	at nextflow.script.WorkflowDef.run0(WorkflowDef.groovy:186)
+	at nextflow.script.WorkflowDef.run(WorkflowDef.groovy:170)
+	... 35 common frames omitted
