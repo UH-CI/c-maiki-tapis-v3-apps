@@ -52,15 +52,15 @@ echo "singleBarcoded = $singleBarcoded"
 echo "args: ${args[@]}"
 
 cd demux-app-v1.0/
-echo "PWD: $PWD"
-ls ./test
 
-# ./nextflow run src/main.nf --inputdir "$PWD/${folder}" ${args[*]} && ./nextflow clean -f -q || echo "Run Failed"
-./nextflow run ./src/main.nf --inputdir "./test" ${args[*]}
+./nextflow run src/main.nf --inputdir "../reads" ${args[*]} && ./nextflow clean -f -q || echo "Run Failed"
 
-# echo "Compressing output folders"
+echo "Compressing output folders"
 # mv demultiplexed/*.html .
-# tar -cf demultiplexed.tar demultiplexed
+tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log ./debug.log
+tar -cf demultiplexed_outputs.tar ./demultiplexed
+mv demultiplexed_outputs.tar nextflow_work_debug.tar ../
 
-# echo "Cleaning up"
-# rm -rf nextflow .nextflow src demultiplexed work conf scripts ${folder}
+echo "Cleaning up"
+cd ../
+rm -rf demux-app-v1.0

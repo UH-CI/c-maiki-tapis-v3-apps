@@ -101,16 +101,18 @@ echo "args passed to nextflow: ${args[@]}"
 
 reads_no_ext=$(basename "${reads}" .tar) # in case the reads are provided as a tar file
 if [ "${reads_no_ext}" != "${reads}" ]; then
-    read_path="${PWD}/${reads_no_ext}/reads/${suffix}"
+    read_path="$../reads/${reads_no_ext}/${suffix}"
 else
-    read_path="${PWD}/${reads}/${suffix}"
+    read_path="$../reads/${suffix}"
 fi
 
 cd 16S-pipeline-app-v2.0/
 
+echo "read_path: $read_path"
+
 echo "Starting pipeline"
-# ./nextflow run src/main.nf --reads "$read_path" ${args[*]}
-./nextflow run ./src/main.nf --reads "./test" ${args[*]}
+./nextflow run src/main.nf --reads "$read_path" ${args[*]}
+
 echo "Leaving pipeline"
 
 echo "Compressing output folders"
@@ -123,6 +125,6 @@ cd ../
 
 echo "Cleaning up"
 rm -rf 16S-pipeline-app-v2.0/
-# # rm -rf ${reads_no_ext}
+# rm -rf ${reads_no_ext}
 
 echo "Script execution completed at $(date)"

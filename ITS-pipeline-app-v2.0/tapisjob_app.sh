@@ -64,21 +64,32 @@ else
     pattern="*_R1"
 fi
 
-echo "args after flags: ${args[@]}"
-
-# Get paths to input reads
-reads_no_ext=$(basename ${reads} .tar)
-[ "${reads_no_ext}" != "${reads}" ] && read_path="${PWD}/${reads_no_ext}/reads" || read_path="${PWD}/${reads}"
-echo "Read path set to $read_path"
+# Check for tar files in reads
+reads_no_ext=$(basename "${reads}" .tar)
+if [ "${reads_no_ext}" != "${reads}" ]; then
+    # Set path to reads dir within untarred file
+    read_path="${PWD}/${reads_no_ext}/reads"
+    # Check if the directory exists, extract tar file if not
+    if [ ! -d "$read_path" ]; then
+        # Create directory if it doesn't exist
+        mkdir -p "$read_path"
+        # Extract tar file to reads dir
+        tar -xf "${PWD}/${reads}" -C "$read_path"
+    fi
+else
+    read_path="${PWD}/reads"
+fi
 
 pattern+=$(ls -1 $read_path/*_R1* 2>/dev/null | head -1 | sed 's/.*_R1//')
 echo "Final pattern: $pattern" 
 
 cd ITS-pipeline-app-v2.0/
 
+echo "Files in read_path:"
+ls "$read_path"
+
 echo "Executing Nextflow run" 
-# ./ITS-pipeline-app-v2.0/nextflow run src/main.nf --reads "$read_path/$pattern" ${args[*]}
-./nextflow run ./src/main.nf --reads "./test/$pattern" ${args[*]}
+./nextflow run ./src/main.nf --reads "$read_path/$pattern" ${args[*]}
 
 echo "Compressing output folders"
 tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log ./debug.log
@@ -89,6 +100,6 @@ mv nextflow_work_debug.tar ITS-pipeline_outputs.tar ../
 echo "Cleaning up"
 cd ../
 rm -rf ./ITS-pipeline-app-v2.0 
-# # rm -rf ./ITS-pipeline-app-v2.0/$(basename ${reads})
+# rm -rf ./ITS-pipeline-app-v2.0/$(basename ${reads})
 
 echo "Script execution completed at $(date)"
