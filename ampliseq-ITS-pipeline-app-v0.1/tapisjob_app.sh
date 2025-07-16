@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 
 source ~/.bashrc
-module load lang/Java/11
+module load lang/Java/17
 
 export NXF_HOME=$PWD/ampliseq-ITS-pipeline-app-v0.1/.nextflow
-export NXF_SINGULARITY_CACHEDIR=/home/andyyu/apps/singularity_images.cache
-echo "NXF_HOME: $NXF_HOME"
+export NXF_SINGULARITY_CACHEDIR=/mnt/lustre/koa/lab/cmaiki_group/cmaiki_v2_apps/singularity_images.cache
 
-# Check if is_test is set and non-empty before comparison
-if [ ! -z "${is_test}" ] && [ "${is_test}" -eq 1 ]; then
-    conf="hpc_test"
-else
-    conf="hpc"
-fi
-echo "Conf: $conf"
+# Cleanup function that runs on script exit
+cleanup() {
+    # ONLY FOR DEV. REMOVE IN PROD
+    # Change file permissions to enable deletion by other users
+    chmod -R g+w $PWD 2>/dev/null || true
+    
+}
+
+# Set trap to run cleanup on script exit (normal or error)
+trap cleanup EXIT
 
 args=(
-    -r 2.11.0
-    # -profile singularity
-    -c "conf/${conf}.config"
+    -r 2.14.0
+    -c "conf/hpc.config"
     --outdir "./ampliseq_ITS_pipeline_outputs"
 )
 
@@ -28,6 +29,13 @@ while [[ "$#" -gt 0 ]]; do
         --input_fasta) input_fasta="$2"; shift ;;
         --FW_primer) FW_primer="$2"; shift ;;
         --RV_primer) RV_primer="$2"; shift ;;
+        --metadata) 
+            if [[ "$2" == tapis://cmaiki-v2-dev-koa-hpc/* ]]; then
+                metadata="${2#tapis://cmaiki-v2-dev-koa-hpc}"
+            else
+                metadata="$2"
+            fi
+            shift ;;
         --skip_cutadapt) skip_cutadapt=1 ;;
         --cut_its) cut_its="$2"; shift ;;
         --its_partial) its_partial="$2"; shift ;;
@@ -92,8 +100,6 @@ elif [[ "$pacbio" -eq 1 || "$iontorrent" -eq 1 || "$single_end" -eq 1 ]]; then
     extension="*_R1.fastq.gz"
 fi
 
-echo "Extension: ${extension}"
-
 # Check for tar files in reads
 reads_no_ext=$(basename "${reads}" .tar)
 if [ "${reads_no_ext}" != "${reads}" ]; then
@@ -118,6 +124,7 @@ args+=(
 # Conditionally add parameters if they are not empty
 [[ -n "$FW_primer" ]] && args+=(--FW_primer "$FW_primer")
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
+[[ -n "$metadata" ]] && args+=(--metadata "$metadata")
 # [[ -n "$cut_its" ]] && args+=(--cut_its "$cut_its")
 [[ -n "$its_partial" ]] && args+=(--its_partial "$its_partial")
 [[ -n "$extension" ]] && args+=(--extension "$extension")
@@ -162,25 +169,43 @@ args+=(
 
 [[ -n "$dada_ref_tax_custom_sp" ]] && args+=(--dada_ref_tax_custom_sp "$dada_ref_tax_custom_sp")
 
-# Remove FW_primer and RV_primer from args if skip_cutadapt is set
-if [[ "$skip_cutadapt" -eq 1 ]]; then
-    args=("${args[@]/--FW_primer*}")
-    args=("${args[@]/--RV_primer*}")
-fi
+# # Remove FW_primer and RV_primer from args if skip_cutadapt is set
+# if [[ "$skip_cutadapt" -eq 1 ]]; then
+#     new_args=()
+#     skip_next=0
+    
+#     for arg in "${args[@]}"; do
+#         if [[ "$skip_next" -eq 1 ]]; then
+#             skip_next=0
+#             continue
+#         fi
+        
+#         if [[ "$arg" == "--FW_primer" || "$arg" == "--RV_primer" ]]; then
+#             skip_next=1
+#             continue
+#         fi
+        
+#         new_args+=("$arg")
+#     done
+    
+#     args=("${new_args[@]}")
+# fi
 
 echo "args: ${args[@]}"
+echo "read_path: $read_path"
+ls $read_path
 
 cd ampliseq-ITS-pipeline-app-v0.1/
 
 echo "Executing Nextflow run"
 ./nextflow run nf-core/ampliseq "${args[@]}"
 
-# echo "Compressing output folders"
-# tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log ./debug.log
-# tar -cf ampliseq_ITS_pipeline_outputs.tar ./ampliseq_ITS_pipeline_outputs
+echo "Compressing output folders"
+tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
+tar -cf ampliseq_ITS_pipeline_outputs.tar ./ampliseq_ITS_pipeline_outputs
 
-# mv nextflow_work_debug.tar ampliseq_ITS_pipeline_outputs.tar ../
+mv nextflow_work_debug.tar ampliseq_ITS_pipeline_outputs.tar ../
 
-# echo "Cleaning up"
-# cd ../
-# rm -rf ./ampliseq-ITS-pipeline-app-v0.1 ./reads ./dbs
+echo "Cleaning up"
+cd ../
+rm -rf ./ampliseq-ITS-pipeline-app-v0.1 ./reads ./dbs

@@ -6,13 +6,24 @@ module load lang/Java/11
 cd 16S-pipeline-app-v0.0.2
 
 for f in $(ls *.tar.gz); do
-    tar -xzf ${f} && rm ${f}
+    tar -xzf ${f} --warning=no-unknown-keyword && rm ${f}
 done
 
 conf="hpc"
 rm -f *.tar.gz
 
 export NXF_HOME=$PWD/nf/.nextflow
+
+# Cleanup function that runs on script exit
+cleanup() {
+    # ONLY FOR DEV. REMOVE IN PROD
+    # Change file permissions to enable deletion by other users
+    chmod -R g+w $PWD 2>/dev/null || true
+    
+}
+
+# Set trap to run cleanup on script exit (normal or error)
+trap cleanup EXIT
 
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -59,9 +70,9 @@ elif [[ "$db" == "nr" ]]; then
     db_tax=$(ls dbs/silva.nr*/silva.nr*.tax)
 fi
 
-[ ${singleEnd} -eq 1 ] && args+=(--singleEnd) && suffix="*_R1*.fastq*" || suffix="*_R{1,2}*.fastq*"
+[ ${singleEnd:-0} -eq 1 ] && args+=(--singleEnd) && suffix="*_R1*.fastq*" || suffix="*_R{1,2}*.fastq*"
 [ ! -z ${customSubsamplingLevel} ] && args+=(--customSubsamplingLevel ${customSubsamplingLevel})
-[ ${skipSubsampling} -eq 1 ] && args+=(--skipSubsampling)
+[ ${skipSubsampling:-0} -eq 1 ] && args+=(--skipSubsampling)
 
 taxaBlackList=()
 [ ${removeUnknown} -eq 1 ] && taxaBlackList+=('unknown;')
@@ -108,16 +119,19 @@ args+=("--referenceAln" "${PWD}/${db_aln}")
 args+=("--referenceTax" "${PWD}/${db_tax}")
 
 echo "args: ${args[@]}"]
+echo "reads: $read_path"
+ls $read_dir
 
+echo "Executing Nextflow run" 
 ./nf/nextflow run src/main.nf --reads "$read_path" ${args[*]}
      
-# echo "Compressing output folders"
-# tar -cf nextflow_work_debug.tar work conf/hpc.config src/nextflow.config
-# mkdir filtering_and_denoising_steps
-# cd 16S-pipeline_outputs/Misc ; mv 1-* 2-* 3-* ../../filtering_and_denoising_steps ; cd ../..
-# tar -cf filtering_and_denoising_steps.tar filtering_and_denoising_steps
-# tar -cf 16S-pipeline_outputs.tar 16S-pipeline_outputs
+echo "Compressing output folders"
+tar -cf nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config
+mkdir filtering_and_denoising_steps
+cd 16S-pipeline_outputs/Misc ; mv 1-* 2-* 3-* ../../filtering_and_denoising_steps ; cd ../..
+tar -cf filtering_and_denoising_steps.tar filtering_and_denoising_steps
+tar -cf 16S-pipeline_outputs.tar 16S-pipeline_outputs
 
-# echo "Cleaning up"
-# rm -rf conf nextflow .nextflow scripts src 16S-pipeline_outputs work databases* filtering_and_denoising_steps 
-# rm -rf ${reads_no_ext}
+echo "Cleaning up"
+rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads
+rm -rf ${reads_no_ext}

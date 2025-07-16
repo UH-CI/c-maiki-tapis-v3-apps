@@ -4,7 +4,6 @@ source ~/.bashrc
 module load lang/Java/11
 
 export NXF_HOME=$PWD/ITS-pipeline-app-v2.0/.nextflow
-echo "NXF_HOME: $NXF_HOME"
 
 # Modified to check if variables are set and non-empty before comparison
 if [ ! -z "${is_test}" ] && [ "${is_test}" -eq 1 ]; then
@@ -14,14 +13,16 @@ else
 fi
 echo "Conf: $conf"
 
-locus=""
-max_expected_error=""
-tax_confidence=""
-clustering_thresholds=""
-alpha_diversity=""
-beta_diversity=""
-paired_end=0
-skip_lulu=0
+# Cleanup function that runs on script exit
+cleanup() {
+    # ONLY FOR DEV. REMOVE IN PROD
+    # Change file permissions to enable deletion by other users
+    chmod -R g+w $PWD 2>/dev/null || true
+    
+}
+
+# Set trap to run cleanup on script exit (normal or error)
+trap cleanup EXIT
 
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -49,8 +50,6 @@ args=(
     --beta_diversity "${beta_diversity}"
 )
 
-echo "args: ${args[@]}"
-
 [[ "$skip_lulu" -eq 1 ]] && args+=(--skip_lulu)
 
 # Check paired-end naming pattern
@@ -77,14 +76,18 @@ else
     read_path="${PWD}/reads"
 fi
 
+echo "args: ${args[@]}"
+echo "reads: $read_path"
+ls $read_path
+
 pattern+=$(ls -1 $read_path/*_R1* 2>/dev/null | head -1 | sed 's/.*_R1//')
 cd ITS-pipeline-app-v2.0/
 
 echo "Executing Nextflow run" 
 ./nextflow run ./src/main.nf --reads "$read_path/$pattern" ${args[*]}
 
-# echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log ./debug.log
+echo "Compressing output folders"
+tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log
 tar -cf ITS-pipeline_outputs.tar ./ITS-pipeline_outputs
 
 mv nextflow_work_debug.tar ITS-pipeline_outputs.tar ../

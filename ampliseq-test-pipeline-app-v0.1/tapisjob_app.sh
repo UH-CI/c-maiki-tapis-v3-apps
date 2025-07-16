@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 
 source ~/.bashrc
-module load lang/Java/11
+module load lang/Java/17
 
 export NXF_HOME=$PWD/ampliseq-test-pipeline-app-v0.1/.nextflow
-export NXF_SINGULARITY_CACHEDIR=/home/andyyu/apps/singularity_images.cache
-echo "NXF_HOME: $NXF_HOME"
+export NXF_SINGULARITY_CACHEDIR=/mnt/lustre/koa/koastore/cmaiki_group/cmaiki_group/apps/singularity_images.cache
 
-# Check if is_test is set and non-empty before comparison
-if [ ! -z "${is_test}" ] && [ "${is_test}" -eq 1 ]; then
-    conf="hpc_test"
-else
-    conf="hpc"
-fi
-echo "Conf: $conf"
+# Cleanup function that runs on script exit
+cleanup() {
+    # ONLY FOR DEV. REMOVE IN PROD
+    # Change file permissions to enable deletion by other users
+    chmod -R g+w $PWD 2>/dev/null || true
+    
+}
+
+# Set trap to run cleanup on script exit (normal or error)
+trap cleanup EXIT
 
 args=(
-    -r 2.11.0
-    # -profile singularity
-    --metadata "/home/andyyu/cmaiki_koastore/cmaiki_group/metadata.tsv"
-    -c "conf/${conf}.config"
-    --outdir "./ampliseq_16S_pipeline_outputs"
+    -r 2.14.0
+    -c "conf/hpc.config"
+    --outdir "./ampliseq_test_pipeline_outputs"
 )
 
 # Parse command line arguments
@@ -29,6 +29,13 @@ while [[ "$#" -gt 0 ]]; do
         # --input_fasta) input_fasta="$2"; shift ;;
         --FW_primer) FW_primer="$2"; shift ;;
         --RV_primer) RV_primer="$2"; shift ;;
+                --metadata) 
+            if [[ "$2" == tapis://cmaiki-v2-dev-koa-hpc/* ]]; then
+                metadata="${2#tapis://cmaiki-v2-dev-koa-hpc}"
+            else
+                metadata="$2"
+            fi
+            shift ;;
         --skip_cutadapt) skip_cutadapt=1 ;;
         --save_intermediates) save_intermediates=1 ;;
         --illumina_novaseq) illumina_novaseq=1 ;;
@@ -44,8 +51,8 @@ while [[ "$#" -gt 0 ]]; do
         --trunclenr) trunclenr="$2"; shift ;;
         --trunc_qmin) trunc_qmin="$2"; shift ;;
         --trunc_rmin) trunc_rmin="$2"; shift ;;
-        # --max_ee) max_ee="$2"; shift ;;
-        # --min_len) min_len="$2"; shift ;;
+        --max_ee) max_ee="$2"; shift ;;
+        --min_len) min_len="$2"; shift ;;
         --retain_untrimmed) retain_untrimmed=1 ;;
         --cutadapt_min_overlap) cutadapt_min_overlap="$2"; shift ;;
         --cutadapt_max_error_rate) cutadapt_max_error_rate="$2"; shift ;;
@@ -72,13 +79,13 @@ while [[ "$#" -gt 0 ]]; do
         --min_frequency) min_frequency="$2"; shift ;;
         --min_samples) min_samples="$2"; shift ;;
         --diversity_rarefaction_depth) diversity_rarefaction_depth="$2"; shift ;;
-        # --skip_fastqc) skip_fastqc=1 ;;
-        # --skip_dada_quality) skip_dada_quality=1 ;;
+        --skip_fastqc) skip_fastqc=1 ;;
+        --skip_dada_quality) skip_dada_quality=1 ;;
         --skip_barrnap) skip_barrnap=1 ;;
-        # --skip_qiime) skip_qiime=1 ;;
-        # --skip_qiime_downstream) skip_qiime_downstream=1 ;;
-        # --skip_taxonomy) skip_taxonomy=1 ;;
-        # --skip_dada_taxonomy) skip_dada_taxonomy=1 ;;
+        --skip_qiime) skip_qiime=1 ;;
+        --skip_qiime_downstream) skip_qiime_downstream=1 ;;
+        --skip_taxonomy) skip_taxonomy=1 ;;
+        --skip_dada_taxonomy) skip_dada_taxonomy=1 ;;
         --skip_alpha_rarefaction) skip_alpha_rarefaction=1 ;;
         --skip_diversity_indices) skip_diversity_indices=1 ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
@@ -96,8 +103,6 @@ elif [[ "$pacbio" -eq 1 || "$iontorrent" -eq 1 || "$single_end" -eq 1 ]]; then
     [[ "$single_end" -eq 1 ]] && args+=(--single_end)
     extension="*_R1.fastq.gz"
 fi
-
-echo "Extension: ${extension}"
 
 # Check for tar files in reads
 reads_no_ext=$(basename "${reads}" .tar)
@@ -123,7 +128,7 @@ args+=(
 # Conditionally add parameters if they are not empty
 [[ -n "$FW_primer" ]] && args+=(--FW_primer "$FW_primer")
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
-
+[[ -n "$metadata" ]] && args+=(--metadata "$metadata")
 [[ -n "$extension" ]] && args+=(--extension "$extension")
 [[ -n "$min_read_counts" ]] && args+=(--min_read_counts "$min_read_counts")
 [[ -n "$trunclenf" ]] && args+=(--trunclenf "$trunclenf")
@@ -183,25 +188,43 @@ args+=(
 
 [[ -n "$dada_ref_tax_custom_sp" ]] && args+=(--dada_ref_tax_custom_sp "$dada_ref_tax_custom_sp")
 
-# Remove FW_primer and RV_primer from args if skip_cutadapt is set
-if [[ "$skip_cutadapt" -eq 1 ]]; then
-    args=("${args[@]/--FW_primer*}")
-    args=("${args[@]/--RV_primer*}")
-fi
+# # Remove FW_primer and RV_primer from args if skip_cutadapt is set
+# if [[ "$skip_cutadapt" -eq 1 ]]; then
+#     new_args=()
+#     skip_next=0
+    
+#     for arg in "${args[@]}"; do
+#         if [[ "$skip_next" -eq 1 ]]; then
+#             skip_next=0
+#             continue
+#         fi
+        
+#         if [[ "$arg" == "--FW_primer" || "$arg" == "--RV_primer" ]]; then
+#             skip_next=1
+#             continue
+#         fi
+        
+#         new_args+=("$arg")
+#     done
+    
+#     args=("${new_args[@]}")
+# fi
 
 echo "args: ${args[@]}"
+echo "reads: $read_path"
+ls $read_path
 
 cd ampliseq-test-pipeline-app-v0.1/
 
 echo "Executing Nextflow run"
 ./nextflow run nf-core/ampliseq "${args[@]}"
 
-# echo "Compressing output folders"
-# tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log ./debug.log
-# tar -cf ampliseq_ITS_pipeline_outputs.tar ./ampliseq_ITS_pipeline_outputs
+echo "Compressing output folders"
+tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
+tar -cf ampliseq_test_pipeline_outputs.tar ./ampliseq_test_pipeline_outputs
 
-# mv nextflow_work_debug.tar ampliseq_ITS_pipeline_outputs.tar ../
+mv nextflow_work_debug.tar ampliseq_test_pipeline_outputs.tar ../
 
-# echo "Cleaning up"
-# cd ../
-# rm -rf ./ampliseq-ITS-pipeline-app-v0.1 ./reads ./dbs
+echo "Cleaning up"
+cd ../
+rm -rf ./ampliseq-test-pipeline-app-v0.1 ./reads ./dbs

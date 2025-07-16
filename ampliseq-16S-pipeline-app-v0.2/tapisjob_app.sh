@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 
 source ~/.bashrc
-module load lang/Java/11
+module load lang/Java/17
 
 export NXF_HOME=$PWD/ampliseq-16S-pipeline-app-v0.2/.nextflow
-export NXF_SINGULARITY_CACHEDIR=/home/andyyu/apps/singularity_images.cache
-echo "NXF_HOME: $NXF_HOME"
+export NXF_SINGULARITY_CACHEDIR=/mnt/lustre/koa/lab/cmaiki_group/cmaiki_v2_apps/singularity_images.cache
 
-# Check if is_test is set and non-empty before comparison
-if [ ! -z "${is_test}" ] && [ "${is_test}" -eq 1 ]; then
-    conf="hpc_test"
-else
-    conf="hpc"
-fi
-echo "Conf: $conf"
+# Cleanup function that runs on script exit
+cleanup() {
+    # ONLY FOR DEV. REMOVE IN PROD
+    # Change file permissions to enable deletion by other users
+    chmod -R g+w $PWD 2>/dev/null || true
+    
+}
+
+# Set trap to run cleanup on script exit (normal or error)
+trap cleanup EXIT
 
 args=(
-    -r 2.12.0
-    # -profile singularity
-    # --metadata "/home/andyyu/cmaiki_koastore/cmaiki_group/metadata.tsv"
-    -c "conf/${conf}.config"
+    -r 2.14.0
+    -c "conf/hpc.config"
     --outdir "./ampliseq_16S_pipeline_outputs"
 )
 
@@ -90,8 +90,6 @@ elif [[ "$pacbio" -eq 1 || "$iontorrent" -eq 1 || "$single_end" -eq 1 ]]; then
     [[ "$single_end" -eq 1 ]] && args+=(--single_end)
     extension="/*_R1.fastq.gz"
 fi
-
-echo "Extension: ${extension}"
 
 # Check for tar files in reads
 reads_no_ext=$(basename "${reads}" .tar)
@@ -190,19 +188,19 @@ if [[ "$skip_cutadapt" -eq 1 ]]; then
 fi
 
 echo "args: ${args[@]}"
+echo "read_path: $read_path"
+ls $read_path
 
 cd ampliseq-16S-pipeline-app-v0.2/
 
 echo "Executing Nextflow run"
 ./nextflow run nf-core/ampliseq "${args[@]}"
 
-# echo "Compressing output folders"
-# tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log ./debug.log
-# tar -cf ampliseq_ITS_pipeline_outputs.tar ./ampliseq_ITS_pipeline_outputs
+echo "Compressing output folders"
+tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
+tar -cf ampliseq_16S_pipeline_outputs.tar ./ampliseq_16S_pipeline_outputs
 
-# mv nextflow_work_debug.tar ampliseq_ITS_pipeline_outputs.tar ../
+mv nextflow_work_debug.tar ampliseq_16S_pipeline_outputs.tar ../
 
 echo "Cleaning up"
-rm -rf ./dbs ./conf my_list_of_remotely_available_images.txt nextflow 
-cd ../
-rm -rf ./reads
+rm -rf ../reads ./dbs ./conf my_list_of_remotely_available_images.txt nextflow 
