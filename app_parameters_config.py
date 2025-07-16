@@ -53,7 +53,7 @@ AMPLISEQ_TEST_ARGS = [
                 {"name": "Illumina Paired End Reads", "arg": "--illumina_pe_its", "description": "If analysing ITS amplicons or any other region with large length variability with Illumina paired end reads", "inputMode": "INCLUDE_ON_DEMAND", "notes": {"Advanced": "true"}},
     
 #                 {"name": "multiple_sequencing_runs", "arg": "--multiple_sequencing_runs", "description": "Multiple sequencing runs?", "inputMode": "INCLUDE_ON_DEMAND", "notes": {"Info":"See https://earthmicrobiome.org/protocols-and-standards/ for a reference on primers"}},
-                {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED", "notes": {"Info":"See ..."}},
+                {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension - If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED", "notes": {"Info":"See ..."}},
 #                 {"name": "max_ee", "arg": "--max_ee 3", "description": "Maximum number of expected errors per read (>0). DADA2 read filtering option", "inputMode": "REQUIRED"},
                 
                 # Connected args
@@ -123,7 +123,7 @@ AMPLISEQ_CONDENSED_AMP_ARGS = [
                 {"name": "Single End Reads", "arg": "--single_end", "description": "If data is single-ended Illumina reads instead of paired-end", "inputMode": "INCLUDE_ON_DEMAND"},
                 {"name": "Illumina Paired End Reads", "arg": "--illumina_pe_its", "description": "If analysing ITS amplicons or any other region with large length variability with Illumina paired end reads", "inputMode": "INCLUDE_ON_DEMAND"},
 #                 {"name": "multiple_sequencing_runs", "arg": "--multiple_sequencing_runs", "description": "Multiple sequencing runs?", "inputMode": "INCLUDE_ON_DEMAND"},
-#                 {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
+#                 {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension - If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
                 {"name": "min_read_counts", "arg": "--min_read_counts 100", "description": "Set read count threshold for failed samples", "inputMode": "REQUIRED"},
                 {"name": "Ignore Empty Input Files", "arg": "--ignore_empty_input_files", "description": "Ignore input files with too few reads", "inputMode": "INCLUDE_BY_DEFAULT"},
                 {"name": "Ignore Failed Trimmings", "arg": "--ignore_failed_trimming", "description": "Ignore files with too few reads after trimming", "inputMode": "INCLUDE_BY_DEFAULT"},
@@ -205,7 +205,7 @@ AMPLISEQ_ITS_AMP_ARGS = [
                 {"name": "IonTorrent Reads", "arg": "--iontorrent", "description": "If data is single-ended IonTorrent reads instead of Illumina", "inputMode": "INCLUDE_ON_DEMAND"},
                 {"name": "Single End Reads", "arg": "--single_end", "description": "If data is single-ended Illumina reads instead of paired-end", "inputMode": "INCLUDE_BY_DEFAULT"},
 #                 {"name": "multiple_sequencing_runs", "arg": "--multiple_sequencing_runs", "description": "Multiple sequencing runs?", "inputMode": "INCLUDE_ON_DEMAND"},
-#                 {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
+#                 {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension - If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
                 {"name": "max_ee", "arg": "--max_ee 3", "description": "Maimum number of expected errors per read (>0). DADA2 read filtering option", "inputMode": "REQUIRED"},
                 {"name": "min_read_counts", "arg": "--min_read_counts 1", "description": "Set read count threshold for failed samples", "inputMode": "REQUIRED"},
                 {"name": "Ignore Empty Input Files", "arg": "--ignore_empty_input_files", "description": "Ignore input files with too few reads", "inputMode": "INCLUDE_BY_DEFAULT"},
@@ -248,7 +248,7 @@ AMPLISEQ_16S_AMP_ARGS = [
 #                 {"name": "IonTorrent Reads", "arg": "--iontorrent", "description": "If data is single-ended IonTorrent reads instead of Illumina", "inputMode": "INCLUDE_ON_DEMAND"},
                 {"name": "Single End Reads", "arg": "--single_end", "description": "If data is single-ended Illumina reads instead of paired-end", "inputMode": "INCLUDE_ON_DEMAND"},
 #                 {"name": "multiple_sequencing_runs", "arg": "--multiple_sequencing_runs", "description": "Multiple sequencing runs?", "inputMode": "INCLUDE_ON_DEMAND"},
-                {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
+                {"name": "extension", "arg": "--extension \"/*_R{1,2}.fastq.gz\"", "description": "Extension - If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
 #                 {"name": "max_ee", "arg": "--max_ee 3", "description": "Maimum number of expected errors per read (>0). DADA2 read filtering option", "inputMode": "REQUIRED"},
                 {"name": "min_read_counts", "arg": "--min_read_counts 100", "description": "Set read count threshold for failed samples", "inputMode": "REQUIRED"},
                 {"name": "Ignore Empty Input Files", "arg": "--ignore_empty_input_files", "description": "Ignore input files with too few reads", "inputMode": "INCLUDE_BY_DEFAULT"},
@@ -319,7 +319,7 @@ AMPLISEQ_AMP_ARGS = [
     {"name": "single_end", "arg": "--single_end", "description": "If data is single-ended Illumina reads instead of paired-end", "inputMode": "REQUIRED"},
     {"name": "illumina_pe_its", "arg": "--illumina_pe_its", "description": "If analysing ITS amplicons or any other region with large length variability with Illumina paired end reads", "inputMode": "REQUIRED"},
     {"name": "multiple_sequencing_runs", "arg": "--multiple_sequencing_runs", "description": "If using `--input_folder`: samples were sequenced in multiple sequencing runs", "inputMode": "REQUIRED"},
-    {"name": "extension", "arg": "--extension /*_R{1,2}_001.fastq.gz", "description": "Extension If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
+    {"name": "extension", "arg": "--extension /*_R{1,2}_001.fastq.gz", "description": "Extension - If using `--input_folder`: naming of sequencing files", "inputMode": "REQUIRED"},
     {"name": "min_read_counts", "arg": "--min_read_counts 1", "description": "Set read count threshold for failed samples", "inputMode": "REQUIRED"},
     {"name": "ignore_empty_input_files", "arg": "--ignore_empty_input_files", "description": "Ignore input files with too few reads", "inputMode": "REQUIRED"},
 

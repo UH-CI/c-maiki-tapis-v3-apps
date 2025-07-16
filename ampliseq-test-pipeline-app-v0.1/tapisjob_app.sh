@@ -122,7 +122,6 @@ fi
 
 args+=(
     --input_folder "${read_path}/"
-    --extension "${extension}"
 )
 
 # Conditionally add parameters if they are not empty

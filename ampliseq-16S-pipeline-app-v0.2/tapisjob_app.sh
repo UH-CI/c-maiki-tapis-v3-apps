@@ -109,7 +109,6 @@ fi
 
 args+=(
     --input_folder "${read_path}"
-    --extension "${extension}"
 )
 
 # Conditionally add parameters if they are not empty
@@ -117,7 +116,7 @@ args+=(
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
 
 [[ -n "$metadata" ]] && args+=(--metadata "$metadata")
-# [[ -n "$extension" ]] && args+=(--extension "$extension")
+[[ -n "$extension" ]] && args+=(--extension "$extension")
 [[ -n "$min_read_counts" ]] && args+=(--min_read_counts "$min_read_counts")
 [[ -n "$trunclenf" ]] && args+=(--trunclenf "$trunclenf")
 [[ -n "$trunclenr" ]] && args+=(--trunclenr "$trunclenr")
