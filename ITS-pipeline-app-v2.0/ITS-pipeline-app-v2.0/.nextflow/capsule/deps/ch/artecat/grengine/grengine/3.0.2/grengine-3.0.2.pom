@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.artecat.grengine</groupId>
+  <artifactId>grengine</artifactId>
+  <version>3.0.2</version>
+  <name>grengine</name>
+  <description>Grengine is an engine for running and embedding Groovy in a Java VM.</description>
+  <url>https://www.artecat.ch/grengine/</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>jexler</id>
+      <name>Jex Jexler (Alain Stalder)</name>
+      <email>jexler@artecat.ch</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>https://gitlab.com/jexler/grengine.git</connection>
+    <developerConnection>https://gitlab.com/jexler/grengine.git</developerConnection>
+    <url>https://gitlab.com/jexler/grengine</url>
+  </scm>
+</project>

@@ -2,3 +2,7 @@ container/singularity_images.cache/
 container/databases.tar.gz
 local_container/singularity_images.cache/
 local_container/databases.tar.gz
+16S-pipeline-app-v0.0.2/16S-pipeline-app-v0.0.2/dbs.tar.gz
+ampliseq-16S-pipeline-app-v0.2/ampliseq-16S-pipeline-app-v0.2/dbs/*
+.DS_Store
+.ipynb_checkpoints
