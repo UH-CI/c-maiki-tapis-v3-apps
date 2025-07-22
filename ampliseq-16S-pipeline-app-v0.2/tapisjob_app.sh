@@ -4,7 +4,7 @@ source ~/.bashrc
 module load lang/Java/17
 
 export NXF_HOME=$PWD/ampliseq-16S-pipeline-app-v0.2/.nextflow
-export NXF_SINGULARITY_CACHEDIR=/mnt/lustre/koa/lab/cmaiki_group/cmaiki_v2_apps/singularity_images.cache
+export NXF_OFFLINE=true
 
 # Cleanup function that runs on script exit
 cleanup() {
@@ -180,11 +180,27 @@ fi
 
 [[ -n "$dada_ref_tax_custom_sp" ]] && args+=(--dada_ref_tax_custom_sp "$dada_ref_tax_custom_sp")
 
-# Remove FW_primer and RV_primer from args if skip_cutadapt is set
-if [[ "$skip_cutadapt" -eq 1 ]]; then
-    args=("${args[@]/--FW_primer*}")
-    args=("${args[@]/--RV_primer*}")
-fi
+# # Remove FW_primer and RV_primer from args if skip_cutadapt is set
+# if [[ "$skip_cutadapt" -eq 1 ]]; then
+#     new_args=()
+#     skip_next=0
+    
+#     for arg in "${args[@]}"; do
+#         if [[ "$skip_next" -eq 1 ]]; then
+#             skip_next=0
+#             continue
+#         fi
+        
+#         if [[ "$arg" == "--FW_primer" || "$arg" == "--RV_primer" ]]; then
+#             skip_next=1
+#             continue
+#         fi
+        
+#         new_args+=("$arg")
+#     done
+    
+#     args=("${new_args[@]}")
+# fi
 
 echo "args: ${args[@]}"
 echo "read_path: $read_path"
@@ -196,7 +212,7 @@ echo "Executing Nextflow run"
 ./nextflow run nf-core/ampliseq "${args[@]}"
 
 echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
+tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
 tar -cf ampliseq_16S_pipeline_outputs.tar ./ampliseq_16S_pipeline_outputs
 
 mv nextflow_work_debug.tar ampliseq_16S_pipeline_outputs.tar ../

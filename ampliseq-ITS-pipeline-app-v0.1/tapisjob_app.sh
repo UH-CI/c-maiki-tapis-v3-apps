@@ -4,7 +4,7 @@ source ~/.bashrc
 module load lang/Java/17
 
 export NXF_HOME=$PWD/ampliseq-ITS-pipeline-app-v0.1/.nextflow
-export NXF_SINGULARITY_CACHEDIR=/mnt/lustre/koa/lab/cmaiki_group/cmaiki_v2_apps/singularity_images.cache
+export NXF_OFFLINE=true
 
 # Cleanup function that runs on script exit
 cleanup() {
@@ -200,7 +200,7 @@ echo "Executing Nextflow run"
 ./nextflow run nf-core/ampliseq "${args[@]}"
 
 echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
+tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
 tar -cf ampliseq_ITS_pipeline_outputs.tar ./ampliseq_ITS_pipeline_outputs
 
 mv nextflow_work_debug.tar ampliseq_ITS_pipeline_outputs.tar ../

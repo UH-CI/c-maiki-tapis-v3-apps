@@ -14,7 +14,18 @@ fi
 echo "Conf: $conf"
 
 #Added in curl call for adding in element---------------------------------------------------
-id=$(curl -s -X POST "http://128.171.215.53:5000/api/v1/jobinformation" -H "Content-Type: application/json" -d "{\"job_name\": \"Job name temp\", \"job_status\": \"Running\", \"date_submitted\": \"2025-06-23\"}" | jq '.id')
+job_uuid=$(echo "$PWD" | grep -oE '[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}')
+get_current_date_yyyymmdd() {
+  date +"%Y-%m-%d"
+}
+
+current_date=$(get_current_date_yyyymmdd)
+#id=$(curl -s -X POST "http://128.171.215.53:5000/api/v1/jobinformation" -H "Content-Type: application/json" -d "{\"job_name\": \"Job name temp\", \"job_status\": \"Running\", \"date_submitted\": \"2025-06-23\"}" | jq '.id')
+#JOB_ID="$PWD"
+curl -X POST "http://128.171.215.53:5000/api/v1/jobinformation" -H "Content-Type: application/json" -d "{\"job_name\": \"Job name temp\", \"job_status\": \"Running\", \"date_submitted\": \"$current_date\", \"job_id\": \"$job_uuid\"}"
+#curl -X POST "http://128.171.215.53:5000/api/v1/sequencing" -H "Content-Type: application/json" -d "{\"sequencing_id\": \"$JOB_ID\"}"
+# have to work on this 
+curl -X POST "http://128.171.215.53:5000/api/v1/sequencing" -H "Content-Type: application/json" -d "{\"sequencing_id\": \"$job_uuid\"}"
 #-------------------------------------------------------------------------------------------
 
 # Cleanup function that runs on script exit
@@ -27,7 +38,10 @@ cleanup() {
     exit_code=$?
     if [ $exit_code -ne 0 ] && [ ! -z "$id" ]; then
         echo "Script failed, updating job status to Failed"
-        curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$id" \
+        # curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$id" \
+        #      -H "Content-Type: application/json" \
+        #      -d "{\"job_status\": \"Failed\"}" 2>/dev/null || true
+        curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$job_uuid" \
              -H "Content-Type: application/json" \
              -d "{\"job_status\": \"Failed\"}" 2>/dev/null || true
     fi
@@ -83,5 +97,6 @@ cd ../
 rm -rf ./demux-app-v1.0 ./reads
 
 #Added update curl call-----------------------------------------------------------------
-curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$id" -H "Content-Type: application/json" -d "{\"job_status\": \"Completed\"}"
+#curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$id" -H "Content-Type: application/json" -d "{\"job_status\": \"Completed\"}"
+curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$job_uuid" -H "Content-Type: application/json" -d "{\"job_status\": \"Completed\"}"
 #-------------------------------------------------------------------------------------------

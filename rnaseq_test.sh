@@ -17,4 +17,4 @@ set -x
 
 # Launch nextflow
 echo "Launching Nextflow at $(date)"
-./nextflow run nf-core/rnaseq -r 3.19.0 -profile test, singularity --outdir results
+./nextflow run nf-core/rnaseq -r 3.19.0 -profile test,singularity --outdir results
