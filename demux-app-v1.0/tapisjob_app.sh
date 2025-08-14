@@ -3,6 +3,13 @@
 source ~/.bashrc
 module load lang/Java/11
 
+# Source job utils file
+source ./job_utils.sh
+
+# Job utils function
+setup_tapis_job
+echo ""
+
 export NXF_HOME=$PWD/demux-app-v1.0/.nextflow
 
 # Modified to check if variables are set and non-empty before comparison
@@ -13,46 +20,10 @@ else
 fi
 echo "Conf: $conf"
 
-#Added in curl call for adding in element---------------------------------------------------
-job_uuid=$(echo "$PWD" | grep -oE '[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}')
-get_current_date_yyyymmdd() {
-  date +"%Y-%m-%d"
-}
-
-current_date=$(get_current_date_yyyymmdd)
-#id=$(curl -s -X POST "http://128.171.215.53:5000/api/v1/jobinformation" -H "Content-Type: application/json" -d "{\"job_name\": \"Job name temp\", \"job_status\": \"Running\", \"date_submitted\": \"2025-06-23\"}" | jq '.id')
-#JOB_ID="$PWD"
-curl -X POST "http://128.171.215.53:5000/api/v1/jobinformation" -H "Content-Type: application/json" -d "{\"job_name\": \"Job name temp\", \"job_status\": \"Running\", \"date_submitted\": \"$current_date\", \"job_id\": \"$job_uuid\"}"
-#curl -X POST "http://128.171.215.53:5000/api/v1/sequencing" -H "Content-Type: application/json" -d "{\"sequencing_id\": \"$JOB_ID\"}"
-# have to work on this 
-curl -X POST "http://128.171.215.53:5000/api/v1/sequencing" -H "Content-Type: application/json" -d "{\"sequencing_id\": \"$job_uuid\"}"
-#-------------------------------------------------------------------------------------------
-
-# Cleanup function that runs on script exit
-cleanup() {
-    # ONLY FOR DEV. REMOVE IN PROD
-    # Change file permissions to enable deletion by other users
-    chmod -R g+w $PWD 2>/dev/null || true
-    
-    # Check if script is exiting due to an error and update job status accordingly
-    exit_code=$?
-    if [ $exit_code -ne 0 ] && [ ! -z "$id" ]; then
-        echo "Script failed, updating job status to Failed"
-        # curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$id" \
-        #      -H "Content-Type: application/json" \
-        #      -d "{\"job_status\": \"Failed\"}" 2>/dev/null || true
-        curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$job_uuid" \
-             -H "Content-Type: application/json" \
-             -d "{\"job_status\": \"Failed\"}" 2>/dev/null || true
-    fi
-}
-
-# Set trap to run cleanup on script exit (normal or error)
-trap cleanup EXIT
-
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        # --outdir) outdir="$2"; shift ;;
         --max_mismatches) max_mismatches="$2"; shift ;;
         --n_per_file) n_per_file="$2"; shift ;;
         --n_bases) n_bases="$2"; shift ;;
@@ -66,6 +37,7 @@ done
 
 args=(
     -profile ${conf}
+    # --outdir ${outdir}
     --max_mismatches ${max_mismatches}
     --n_per_file ${n_per_file}
     --n_bases ${n_bases}
@@ -79,12 +51,21 @@ echo "args: ${args[@]}"
 
 read_path="${PWD}/reads"
 echo "read_path: $read_path"
-ls $read_path
+echo ""
 
 cd demux-app-v1.0/
 
 echo "Executing Nextflow run" 
-./nextflow run src/main.nf --inputdir "$read_path" ${args[*]} && ./nextflow clean -f -q || echo "Run Failed"
+# Capture the nextflow exit code immediately
+./nextflow run src/main.nf --inputdir "$read_path" ${args[*]}
+nextflow_exit_code=$?
+
+if [ $nextflow_exit_code -eq 0 ]; then
+    ./nextflow clean -f -q
+    echo "Run completed successfully"
+else
+    echo "Run failed with exit code $nextflow_exit_code"
+fi
 
 echo "Compressing output folders"
 mv demultiplexed/*.html .
@@ -94,9 +75,12 @@ mv demultiplexed_outputs.tar nextflow_work_debug.tar ../
 
 echo "Cleaning up"
 cd ../
+tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
 rm -rf ./demux-app-v1.0 ./reads
 
-#Added update curl call-----------------------------------------------------------------
-#curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$id" -H "Content-Type: application/json" -d "{\"job_status\": \"Completed\"}"
-curl -X PUT "http://128.171.215.53:5000/api/v1/jobinformation/$job_uuid" -H "Content-Type: application/json" -d "{\"job_status\": \"Completed\"}"
-#-------------------------------------------------------------------------------------------
+# Job utils function
+if [ $nextflow_exit_code -ne 0 ]; then
+    fail_job
+else
+    complete_job
+fi

@@ -20,12 +20,12 @@ trap cleanup EXIT
 args=(
     -r 2.14.0
     -c "conf/hpc.config"
-    --outdir "./ampliseq_test_pipeline_outputs"
 )
 
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        --outdir) outdir="$2"; shift ;;
         # --input_fasta) input_fasta="$2"; shift ;;
         --FW_primer) FW_primer="$2"; shift ;;
         --RV_primer) RV_primer="$2"; shift ;;
@@ -125,6 +125,7 @@ args+=(
 )
 
 # Conditionally add parameters if they are not empty
+[[ -n "$outdir" ]] && args+=(--outdir "$outdir")
 [[ -n "$FW_primer" ]] && args+=(--FW_primer "$FW_primer")
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
 [[ -n "$metadata" ]] && args+=(--metadata "$metadata")
