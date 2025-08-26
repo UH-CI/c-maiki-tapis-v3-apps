@@ -3,29 +3,25 @@
 source ~/.bashrc
 module load lang/Java/17
 
+# Source job utils file
+source ./job_utils.sh
+
+# Job utils function
+setup_tapis_job
+echo ""
+
 export NXF_HOME=$PWD/ampliseq-ITS-pipeline-app-v0.1/.nextflow
 export NXF_OFFLINE=true
-
-# Cleanup function that runs on script exit
-cleanup() {
-    # ONLY FOR DEV. REMOVE IN PROD
-    # Change file permissions to enable deletion by other users
-    chmod -R g+w $PWD 2>/dev/null || true
-    
-}
-
-# Set trap to run cleanup on script exit (normal or error)
-trap cleanup EXIT
 
 args=(
     -r 2.14.0
     -c "conf/hpc.config"
-    --outdir "./ampliseq_ITS_pipeline_outputs"
 )
 
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        --outdir) outdir="$2"; shift ;;
         --input_fasta) input_fasta="$2"; shift ;;
         --FW_primer) FW_primer="$2"; shift ;;
         --RV_primer) RV_primer="$2"; shift ;;
@@ -121,6 +117,7 @@ args+=(
 )
 
 # Conditionally add parameters if they are not empty
+[[ -n "$outdir" ]] && args+=(--outdir "$outdir")
 [[ -n "$FW_primer" ]] && args+=(--FW_primer "$FW_primer")
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
 [[ -n "$metadata" ]] && args+=(--metadata "$metadata")
@@ -198,6 +195,14 @@ cd ampliseq-ITS-pipeline-app-v0.1/
 
 echo "Executing Nextflow run"
 ./nextflow run nf-core/ampliseq "${args[@]}"
+nextflow_exit_code=$?
+
+if [ $nextflow_exit_code -eq 0 ]; then
+    ./nextflow clean -f -q
+    echo "Run completed successfully"
+else
+    echo "Run failed with exit code $nextflow_exit_code"
+fi
 
 echo "Compressing output folders"
 tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
@@ -207,4 +212,12 @@ mv nextflow_work_debug.tar ampliseq_ITS_pipeline_outputs.tar ../
 
 echo "Cleaning up"
 cd ../
+tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
 rm -rf ./ampliseq-ITS-pipeline-app-v0.1 ./reads ./dbs
+
+# Job utils function
+if [ $nextflow_exit_code -ne 0 ]; then
+    fail_job
+else
+    complete_job
+fi

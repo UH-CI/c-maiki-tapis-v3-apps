@@ -3,6 +3,13 @@
 source ~/.bashrc
 module load lang/Java/11
 
+# Source job utils file
+source ./job_utils.sh
+
+# Job utils function
+setup_tapis_job
+echo ""
+
 export NXF_HOME=$PWD/ITS-pipeline-app-v2.0/.nextflow
 
 # Modified to check if variables are set and non-empty before comparison
@@ -27,6 +34,7 @@ trap cleanup EXIT
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        --outdir) outdir="$2"; shift ;;
         --locus) locus="$2"; shift ;;
         --paired_end) paired_end=1;;
         --max_expected_error) max_expected_error="$2"; shift ;;
@@ -42,6 +50,7 @@ done
 
 args=(
     -profile "${conf}"
+    --outdir "${outdir}"
     --locus "${locus}"
     --max_expected_error "${max_expected_error}"
     --tax_confidence "${tax_confidence}"
@@ -85,6 +94,14 @@ cd ITS-pipeline-app-v2.0/
 
 echo "Executing Nextflow run" 
 ./nextflow run ./src/main.nf --reads "$read_path/$pattern" ${args[*]}
+nextflow_exit_code=$?
+
+if [ $nextflow_exit_code -eq 0 ]; then
+    ./nextflow clean -f -q
+    echo "Run completed successfully"
+else
+    echo "Run failed with exit code $nextflow_exit_code"
+fi
 
 echo "Compressing output folders"
 tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log
@@ -94,4 +111,12 @@ mv nextflow_work_debug.tar ITS-pipeline_outputs.tar ../
 
 echo "Cleaning up"
 cd ../
+tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
 rm -rf ./ITS-pipeline-app-v2.0 ./reads ./dbs
+
+# Job utils function
+if [ $nextflow_exit_code -ne 0 ]; then
+    fail_job
+else
+    complete_job
+fi

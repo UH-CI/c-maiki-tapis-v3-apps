@@ -3,6 +3,13 @@
 source ~/.bashrc
 module load lang/Java/11
 
+# Source job utils file
+source ./job_utils.sh
+
+# Job utils function
+setup_tapis_job
+echo ""
+
 cd 16S-pipeline-app-v0.0.2
 
 for f in $(ls *.tar.gz); do
@@ -14,20 +21,10 @@ rm -f *.tar.gz
 
 export NXF_HOME=$PWD/nf/.nextflow
 
-# Cleanup function that runs on script exit
-cleanup() {
-    # ONLY FOR DEV. REMOVE IN PROD
-    # Change file permissions to enable deletion by other users
-    chmod -R g+w $PWD 2>/dev/null || true
-    
-}
-
-# Set trap to run cleanup on script exit (normal or error)
-trap cleanup EXIT
-
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        --outdir) outdir="$2"; shift; args+=(--outdir "${outdir}");;
         --db) db="$2"; shift;;
         --truncFwd) truncFwd="$2"; shift;;
         --truncRev) truncRev="$2"; shift;;
@@ -124,6 +121,14 @@ ls $read_dir
 
 echo "Executing Nextflow run" 
 ./nf/nextflow run src/main.nf --reads "$read_path" ${args[*]}
+nextflow_exit_code=$?
+
+if [ $nextflow_exit_code -eq 0 ]; then
+    ./nextflow clean -f -q
+    echo "Run completed successfully"
+else
+    echo "Run failed with exit code $nextflow_exit_code"
+fi
      
 echo "Compressing output folders"
 tar -cf nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config
@@ -135,3 +140,12 @@ tar -cf 16S-pipeline_outputs.tar 16S-pipeline_outputs
 echo "Cleaning up"
 rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads
 rm -rf ${reads_no_ext}
+cd ../
+tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
+
+# Job utils function
+if [ $nextflow_exit_code -ne 0 ]; then
+    fail_job
+else
+    complete_job
+fi
