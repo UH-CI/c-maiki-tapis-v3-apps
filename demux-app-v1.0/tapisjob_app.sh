@@ -3,7 +3,6 @@
 source ~/.bashrc
 module load lang/Java/11
 
-# Source job utils file
 source ./job_utils.sh
 
 # Job utils function

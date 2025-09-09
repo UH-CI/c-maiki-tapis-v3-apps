@@ -131,14 +131,15 @@ else
 fi
      
 echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config
+tar -cf ../nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log
+
 mkdir filtering_and_denoising_steps
 cd 16S-pipeline_outputs/Misc ; mv 1-* 2-* 3-* ../../filtering_and_denoising_steps ; cd ../..
-tar -cf filtering_and_denoising_steps.tar filtering_and_denoising_steps
-tar -cf 16S-pipeline_outputs.tar 16S-pipeline_outputs
+tar -cf ../filtering_and_denoising_steps.tar filtering_and_denoising_steps
+tar -cf ../16S-pipeline_outputs.tar 16S-pipeline_outputs
 
 echo "Cleaning up"
-rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads
+rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads src .nextflow .nextflow.log ../16S-pipeline-app-v0.0.2
 rm -rf ${reads_no_ext}
 cd ../
 tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh

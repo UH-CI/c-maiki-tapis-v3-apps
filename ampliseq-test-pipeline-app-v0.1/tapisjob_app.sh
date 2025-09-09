@@ -224,15 +224,14 @@ else
 fi
 
 echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
+tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log ../tapisjob.env
 tar -cf ampliseq_test_pipeline_outputs.tar ./ampliseq_test_pipeline_outputs
 
 mv nextflow_work_debug.tar ampliseq_test_pipeline_outputs.tar ../
 
 echo "Cleaning up"
 cd ../
-tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
-rm -rf ./ampliseq-test-pipeline-app-v0.1 ./reads ./dbs
+rm -rf ./ampliseq-test-pipeline-app-v0.1 ./reads ./dbs job_utils.sh tapisjob.sh  tapisjob_app.sh
 
 # Job utils function
 if [ $nextflow_exit_code -ne 0 ]; then

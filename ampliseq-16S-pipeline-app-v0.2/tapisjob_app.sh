@@ -21,7 +21,7 @@ args=(
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --outdir) outdir="$2"; shift ;;
+        # --outdir) outdir="$2"; shift ;;
         # --input_fasta) input_fasta="$2"; shift ;;
         --FW_primer) FW_primer="$2"; shift ;;
         --RV_primer) RV_primer="$2"; shift ;;
@@ -108,7 +108,7 @@ args+=(
 )
 
 # Conditionally add parameters if they are not empty
-[[ -n "$outdir" ]] && args+=(--outdir "$outdir")
+# [[ -n "$outdir" ]] && args+=(--outdir "$outdir")
 [[ -n "$FW_primer" ]] && args+=(--FW_primer "$FW_primer")
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
 
@@ -217,7 +217,7 @@ else
 fi
 
 echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log
+tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log ../tapisjob.env
 tar -cf ampliseq_16S_pipeline_outputs.tar ./ampliseq_16S_pipeline_outputs
 
 mv nextflow_work_debug.tar ampliseq_16S_pipeline_outputs.tar ../
@@ -225,7 +225,7 @@ mv nextflow_work_debug.tar ampliseq_16S_pipeline_outputs.tar ../
 echo "Cleaning up"
 rm -rf ../reads ./dbs ./conf my_list_of_remotely_available_images.txt nextflow 
 cd ../
-tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
+rm -rf job_utils.sh tapisjob.sh  tapisjob_app.sh
 
 # Job utils function
 if [ $nextflow_exit_code -ne 0 ]; then
