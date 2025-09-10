@@ -8,7 +8,6 @@ source ./job_utils.sh
 
 # Job utils function
 setup_tapis_job
-echo ""
 
 export NXF_HOME=$PWD/ITS-pipeline-app-v2.0/.nextflow
 
@@ -20,21 +19,10 @@ else
 fi
 echo "Conf: $conf"
 
-# Cleanup function that runs on script exit
-cleanup() {
-    # ONLY FOR DEV. REMOVE IN PROD
-    # Change file permissions to enable deletion by other users
-    chmod -R g+w $PWD 2>/dev/null || true
-    
-}
-
-# Set trap to run cleanup on script exit (normal or error)
-trap cleanup EXIT
-
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --outdir) outdir="$2"; shift ;;
+        # --outdir) outdir="$2"; shift ;;
         --locus) locus="$2"; shift ;;
         --paired_end) paired_end=1;;
         --max_expected_error) max_expected_error="$2"; shift ;;
@@ -50,7 +38,7 @@ done
 
 args=(
     -profile "${conf}"
-    --outdir "${outdir}"
+    # --outdir "${outdir}"
     --locus "${locus}"
     --max_expected_error "${max_expected_error}"
     --tax_confidence "${tax_confidence}"
@@ -104,15 +92,14 @@ else
 fi
 
 echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log
-tar -cf ITS-pipeline_outputs.tar ./ITS-pipeline_outputs
+tar -cf nextflow_work_debug.tar work ./conf/${conf}.config ./src/nextflow.config .nextflow.log  -C .. tapisjob.env
+tar -cf ITS-pipeline_outputs.tar ITS-pipeline_outputs
 
 mv nextflow_work_debug.tar ITS-pipeline_outputs.tar ../
 
 echo "Cleaning up"
 cd ../
-tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
-rm -rf ./ITS-pipeline-app-v2.0 ./reads ./dbs
+rm -rf ./ITS-pipeline-app-v2.0 ./reads ./dbs job_utils.sh tapisjob.sh  tapisjob_app.sh tapisjob.env
 
 # Job utils function
 if [ $nextflow_exit_code -ne 0 ]; then

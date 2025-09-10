@@ -8,7 +8,6 @@ source ./job_utils.sh
 
 # Job utils function
 setup_tapis_job
-echo ""
 
 cd 16S-pipeline-app-v0.0.2
 
@@ -24,7 +23,7 @@ export NXF_HOME=$PWD/nf/.nextflow
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --outdir) outdir="$2"; shift; args+=(--outdir "${outdir}");;
+        # --outdir) outdir="$2"; shift; args+=(--outdir "${outdir}");;
         --db) db="$2"; shift;;
         --truncFwd) truncFwd="$2"; shift;;
         --truncRev) truncRev="$2"; shift;;
@@ -124,14 +123,14 @@ echo "Executing Nextflow run"
 nextflow_exit_code=$?
 
 if [ $nextflow_exit_code -eq 0 ]; then
-    ./nextflow clean -f -q
+    ./nf/nextflow clean -f -q
     echo "Run completed successfully"
 else
     echo "Run failed with exit code $nextflow_exit_code"
 fi
      
 echo "Compressing output folders"
-tar -cf ../nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log
+tar -cf ../nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log -C .. tapisjob.env
 
 mkdir filtering_and_denoising_steps
 cd 16S-pipeline_outputs/Misc ; mv 1-* 2-* 3-* ../../filtering_and_denoising_steps ; cd ../..
@@ -142,7 +141,7 @@ echo "Cleaning up"
 rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads src .nextflow .nextflow.log ../16S-pipeline-app-v0.0.2
 rm -rf ${reads_no_ext}
 cd ../
-tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
+rm -rf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
 
 # Job utils function
 if [ $nextflow_exit_code -ne 0 ]; then

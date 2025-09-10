@@ -3,11 +3,11 @@
 source ~/.bashrc
 module load lang/Java/11
 
+# Source job utils file
 source ./job_utils.sh
 
 # Job utils function
 setup_tapis_job
-echo ""
 
 export NXF_HOME=$PWD/demux-app-v1.0/.nextflow
 
@@ -68,14 +68,14 @@ fi
 
 echo "Compressing output folders"
 mv demultiplexed/*.html .
-tar -cf nextflow_work_debug.tar ./work ./conf/${conf}.config ./src/nextflow.config ./.nextflow.log
+tar -cf nextflow_work_debug.tar work ./conf/${conf}.config ./src/nextflow.config .nextflow.log  -C .. tapisjob.env
 tar -cf demultiplexed_outputs.tar ./demultiplexed
+
 mv demultiplexed_outputs.tar nextflow_work_debug.tar ../
 
 echo "Cleaning up"
 cd ../
-tar --remove-files -cf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
-rm -rf ./demux-app-v1.0 ./reads
+rm -rf ./demux-app-v1.0 ./reads  job_utils.sh tapisjob.sh  tapisjob_app.sh tapisjob.env
 
 # Job utils function
 if [ $nextflow_exit_code -ne 0 ]; then

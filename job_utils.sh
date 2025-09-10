@@ -98,9 +98,9 @@ fail_job() {
 
 # Export functions
 export -f init_tapis_vars
-export -f create_job_info
-export -f create_sequencing_entry
-export -f update_job_status
+# export -f create_job_info
+# export -f create_sequencing_entry
+# export -f update_job_status
 export -f archive_job_outputs
 export -f cleanup_job
 export -f setup_tapis_job
