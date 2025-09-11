@@ -8,7 +8,6 @@ source ./job_utils.sh
 
 # Job utils function
 setup_tapis_job
-echo ""
 
 export NXF_HOME=$PWD/ampliseq-ITS-pipeline-app-v0.1/.nextflow
 export NXF_OFFLINE=true
@@ -16,6 +15,7 @@ export NXF_OFFLINE=true
 args=(
     -r 2.14.0
     -c "conf/hpc.config"
+    --outdir "./ampliseq_ITS_pipeline_outputs"
 )
 
 # Parse command line arguments
@@ -205,14 +205,14 @@ else
 fi
 
 echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log ../tapisjob.env
+tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log  -C .. tapisjob.env
 tar -cf ampliseq_ITS_pipeline_outputs.tar ./ampliseq_ITS_pipeline_outputs
 
 mv nextflow_work_debug.tar ampliseq_ITS_pipeline_outputs.tar ../
 
 echo "Cleaning up"
 cd ../
-rm -rf ./ampliseq-ITS-pipeline-app-v0.1 ./reads ./dbs job_utils.sh tapisjob.sh  tapisjob_app.sh
+rm -rf ampliseq-ITS-pipeline-app-v0.1 ./reads ./dbs job_utils.sh tapisjob.sh  tapisjob_app.sh tapisjob.env
 
 # Job utils function
 if [ $nextflow_exit_code -ne 0 ]; then
