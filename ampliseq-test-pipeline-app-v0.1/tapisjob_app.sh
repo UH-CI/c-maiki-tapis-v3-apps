@@ -12,6 +12,30 @@ setup_tapis_job
 export NXF_HOME=$PWD/ampliseq-test-pipeline-app-v0.1/.nextflow
 export NXF_OFFLINE=true
 
+cleanup() {
+    cd ampliseq-test-pipeline-app-v0.1/ 2>/dev/null || cd .
+    
+    echo "Compressing output folders"
+    tar -czf nextflow_work_debug.tar.gz ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log -C .. tapisjob.env 2>/dev/null || true
+    tar -cf ampliseq_test_pipeline_outputs.tar ./ampliseq_test_pipeline_outputs 2>/dev/null || true
+    
+    mv nextflow_work_debug.tar.gz ampliseq_test_pipeline_outputs.tar ../ 2>/dev/null || true
+    
+    echo "Cleaning up"
+    cd ../
+    rm -rf reads metadata metadata.tsv convert_metadata.py validate_metadata.sh python-openpyxl.sif ./ampliseq-test-pipeline-app-v0.1/dbs ./ampliseq-test-pipeline-app-v0.1/conf ./ampliseq-test-pipeline-app-v0.1/my_list_of_remotely_available_images.txt ./ampliseq-test-pipeline-app-v0.1/nextflow 2>/dev/null || true
+    rm -rf ampliseq-test-pipeline-app-v0.1 job_utils.sh tapisjob.sh tapisjob_app.sh tapisjob.env 2>/dev/null || true
+    
+    # Job utils function
+    if [ ${nextflow_exit_code:-1} -ne 0 ]; then
+        fail_job
+    else
+        complete_job
+    fi
+}
+
+trap cleanup EXIT
+
 args=(
     -r 2.14.0
     -c "conf/hpc.config"
@@ -25,13 +49,14 @@ while [[ "$#" -gt 0 ]]; do
         # --input_fasta) input_fasta="$2"; shift ;;
         --FW_primer) FW_primer="$2"; shift ;;
         --RV_primer) RV_primer="$2"; shift ;;
-                --metadata) 
-            if [[ "$2" == tapis://cmaiki-v2-dev-koa-hpc/* ]]; then
-                metadata="${2#tapis://cmaiki-v2-dev-koa-hpc}"
-            else
-                metadata="$2"
-            fi
-            shift ;;
+        --metadata) metadata=1 ;;
+        # --metadata) 
+        #     if [[ "$2" == tapis://cmaiki-v2-dev-koa-hpc/* ]]; then
+        #         metadata="${2#tapis://cmaiki-v2-dev-koa-hpc}"
+        #     else
+        #         metadata="$2"
+        #     fi
+        #     shift ;;
         --skip_cutadapt) skip_cutadapt=1 ;;
         --save_intermediates) save_intermediates=1 ;;
         --illumina_novaseq) illumina_novaseq=1 ;;
@@ -92,12 +117,12 @@ done
 if [[ "$illumina_pe_its" -eq 1 || "$illumina_novaseq" -eq 1 ]]; then
     [[ "$illumina_pe_its" -eq 1 ]] && args+=(--illumina_pe_its)
     [[ "$illumina_novaseq" -eq 1 ]] && args+=(--illumina_novaseq)
-    extension="*_R{1,2}.fastq.gz"
+    extension="/*_R{1,2}.fastq.gz"
 elif [[ "$pacbio" -eq 1 || "$iontorrent" -eq 1 || "$single_end" -eq 1 ]]; then
     [[ "$pacbio" -eq 1 ]] && args+=(--pacbio)
     [[ "$iontorrent" -eq 1 ]] && args+=(--iontorrent)
     [[ "$single_end" -eq 1 ]] && args+=(--single_end)
-    extension="*_R1.fastq.gz"
+    extension="/*_R1.fastq.gz"
 fi
 
 # Check for tar files in reads
@@ -116,6 +141,39 @@ else
     read_path="${PWD}/reads"
 fi
 
+# Validate metadata against reads
+echo "Validating metadata..."
+if ! bash ./validate_metadata.sh "$read_path"; then
+    echo "ERROR: Number of samples in metadata does not match number of FASTQ files in reads directory"
+    echo "Check that each metadata row has corresponding FASTQ files (paired-end: _R1/_R2, single-end: _R1)"
+    exit 1
+fi
+
+# Convert metadata to tsv if user specifies for use in ampliseq
+if [[ "$metadata" -eq 1 ]]; then
+    metadata_xlsx=$(find ./metadata -maxdepth 1 -type f -name "*.xlsx" | head -1)
+    metadata_tsv="${PWD}/metadata.tsv"
+    
+    echo "Converting metadata using Apptainer..."
+    
+    # Get absolute paths for bind mounting
+    metadata_dir=$(dirname "$(realpath "$metadata_xlsx")")
+    output_dir=$(dirname "$(realpath "$metadata_tsv")")
+    script_dir="${PWD}"
+    
+    # Use local packaged container
+    if ! singularity exec \
+        --bind "${metadata_dir}:/input:ro" \
+        --bind "${output_dir}:/output:rw" \
+        --bind "${script_dir}:/scripts:ro" \
+        ./python-openpyxl.sif \
+        python3 /scripts/convert_metadata.py /input/$(basename "$metadata_xlsx") /output/$(basename "$metadata_tsv"); then
+        echo "ERROR: Failed to convert metadata file"
+        exit 1
+    fi
+    
+fi
+
 args+=(
     --input_folder "${read_path}/"
 )
@@ -124,7 +182,13 @@ args+=(
 # [[ -n "$outdir" ]] && args+=(--outdir "$outdir")
 [[ -n "$FW_primer" ]] && args+=(--FW_primer "$FW_primer")
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
-[[ -n "$metadata" ]] && args+=(--metadata "$metadata")
+
+# Add metadata TSV file if it was converted
+if [[ "$metadata" -eq 1 && -f "${PWD}/metadata.tsv" ]]; then
+    args+=(--metadata "${PWD}/metadata.tsv")
+fi
+
+# [[ -n "$metadata" ]] && args+=(--metadata "$metadata")
 [[ -n "$extension" ]] && args+=(--extension "$extension")
 [[ -n "$min_read_counts" ]] && args+=(--min_read_counts "$min_read_counts")
 [[ -n "$trunclenf" ]] && args+=(--trunclenf "$trunclenf")
@@ -160,10 +224,6 @@ args+=(
 # Add optional arguments if set
 [[ "$skip_cutadapt" -eq 1 ]] && args+=(--skip_cutadapt)
 [[ "$save_intermediates" -eq 1 ]] && args+=(--save_intermediates)
-[[ "$illumina_novaseq" -eq 1 ]] && args+=(--illumina_novaseq)
-[[ "$pacbio" -eq 1 ]] && args+=(--pacbio)
-[[ "$iontorrent" -eq 1 ]] && args+=(--iontorrent)
-[[ "$illumina_pe_its" -eq 1 ]] && args+=(--illumina_pe_its)
 [[ "$multiple_sequencing_runs" -eq 1 ]] && args+=(--multiple_sequencing_runs)
 [[ "$ignore_empty_input_files" -eq 1 ]] && args+=(--ignore_empty_input_files)
 [[ "$ignore_failed_trimming" -eq 1 ]] && args+=(--ignore_failed_trimming)
@@ -221,21 +281,4 @@ if [ $nextflow_exit_code -eq 0 ]; then
     echo "Run completed successfully"
 else
     echo "Run failed with exit code $nextflow_exit_code"
-fi
-
-echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log  -C .. tapisjob.env
-tar -cf ampliseq_test_pipeline_outputs.tar ./ampliseq_test_pipeline_outputs
-
-mv nextflow_work_debug.tar ampliseq_test_pipeline_outputs.tar ../
-
-echo "Cleaning up"
-cd ../
-rm -rf ./ampliseq-test-pipeline-app-v0.1 ./reads ./dbs job_utils.sh tapisjob.sh tapisjob_app.sh tapisjob.env
-
-# Job utils function
-if [ $nextflow_exit_code -ne 0 ]; then
-    fail_job
-else
-    complete_job
 fi
