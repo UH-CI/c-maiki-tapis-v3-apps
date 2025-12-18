@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -e
+
+READS_DIR="${1:-reads}"
+METADATA_DIR="${2:-metadata}"
+
+# Find metadata file in metadata directory
+METADATA_FILE=$(find "$METADATA_DIR" -maxdepth 1 -type f -name "*metadata*.xlsx" | head -n 1)
+[ -z "$METADATA_FILE" ] && echo "Error: No metadata file found in $METADATA_DIR" >&2 && exit 1
+
+[ ! -f "$METADATA_FILE" ] && echo "Error: Metadata file not found: $METADATA_FILE" >&2 && exit 1
+[ ! -d "$READS_DIR" ] && echo "Error: Reads directory not found: $READS_DIR" >&2 && exit 1
+
+# Count samples in metadata (column A, rows 12+)
+SHEET_XML=$(unzip -p "$METADATA_FILE" xl/worksheets/sheet1.xml 2>/dev/null)
+[ -z "$SHEET_XML" ] && echo "Error: Cannot read Excel file" >&2 && exit 1
+
+METADATA_COUNT=$(echo "$SHEET_XML" | grep -o '<c r="A1[2-9][0-9]*"[^>]*><v>[^<]*</v></c>' | wc -l)
+
+# Count unique samples in reads directory
+declare -A UNIQUE_SAMPLES
+FASTQ_FILES=$(find "$READS_DIR" -maxdepth 1 -type f \( -name "*.fastq.gz" -o -name "*.fq.gz" -o -name "*.fastq" -o -name "*.fq" \))
+
+while IFS= read -r filepath; do
+    [ -z "$filepath" ] && continue
+    filename=$(basename "$filepath")
+    
+    if [[ "$filename" =~ ^(.+)_R1\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_1\.(fastq|fq)(\.gz)?$ ]]; then
+        UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
+    elif [[ "$filename" =~ ^(.+)_R2\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_2\.(fastq|fq)(\.gz)?$ ]]; then
+        UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
+    fi
+done <<< "$FASTQ_FILES"
+
+SEQUENCE_COUNT=${#UNIQUE_SAMPLES[@]}
+
+echo "Metadata samples: $METADATA_COUNT"
+echo "Sequence samples: $SEQUENCE_COUNT"
+
+if [ "$METADATA_COUNT" -ne "$SEQUENCE_COUNT" ]; then
+    echo ""
+    echo "Error: Count mismatch"
+    exit 1
+fi
+
+echo "Validation passed"
+exit 0
