@@ -11,6 +11,30 @@ setup_tapis_job
 
 export NXF_HOME=$PWD/ITS-pipeline-app-v2.0/.nextflow
 
+cleanup() {
+    cd ITS-pipeline-app-v2.0/ 2>/dev/null || cd .
+    
+    echo "Compressing output folders"
+    tar -czf ../nextflow_work_debug.tar.gz work ./conf/${conf}.config ./src/nextflow.config .nextflow.log -C .. tapisjob.env 2>/dev/null || true
+    tar -cf ../ITS-pipeline_outputs.tar ITS-pipeline_outputs 2>/dev/null || true
+    
+    mv ../nextflow_work_debug.tar.gz ../ITS-pipeline_outputs.tar ../ 2>/dev/null || true
+    
+    echo "Cleaning up"
+    cd ../
+    rm -rf reads metadata validate_metadata.sh ./ITS-pipeline-app-v2.0/dbs ./ITS-pipeline-app-v2.0/conf ./ITS-pipeline-app-v2.0/nextflow 2>/dev/null || true
+    rm -rf ITS-pipeline-app-v2.0 job_utils.sh tapisjob.sh tapisjob_app.sh tapisjob.env 2>/dev/null || true
+    
+    # Job utils function
+    if [ ${nextflow_exit_code:-1} -ne 0 ]; then
+        fail_job
+    else
+        complete_job
+    fi
+}
+
+trap cleanup EXIT
+
 # Modified to check if variables are set and non-empty before comparison
 if [ ! -z "${is_test}" ] && [ "${is_test}" -eq 1 ]; then
     conf="hpc_test"
@@ -73,6 +97,14 @@ else
     read_path="${PWD}/reads"
 fi
 
+# Validate metadata against reads
+echo "Validating metadata..."
+if ! bash ./validate_metadata.sh "$read_path"; then
+    echo "ERROR: Number of samples in metadata does not match number of FASTQ files in reads directory"
+    echo "Check that each metadata row has corresponding FASTQ files (paired-end: _R1/_R2, single-end: _R1)"
+    exit 1
+fi
+
 echo "args: ${args[@]}"
 echo "reads: $read_path"
 ls $read_path
@@ -89,21 +121,4 @@ if [ $nextflow_exit_code -eq 0 ]; then
     echo "Run completed successfully"
 else
     echo "Run failed with exit code $nextflow_exit_code"
-fi
-
-echo "Compressing output folders"
-tar -cf nextflow_work_debug.tar work ./conf/${conf}.config ./src/nextflow.config .nextflow.log  -C .. tapisjob.env
-tar -cf ITS-pipeline_outputs.tar ITS-pipeline_outputs
-
-mv nextflow_work_debug.tar ITS-pipeline_outputs.tar ../
-
-echo "Cleaning up"
-cd ../
-rm -rf ./ITS-pipeline-app-v2.0 ./reads ./dbs job_utils.sh tapisjob.sh  tapisjob_app.sh tapisjob.env
-
-# Job utils function
-if [ $nextflow_exit_code -ne 0 ]; then
-    fail_job
-else
-    complete_job
 fi

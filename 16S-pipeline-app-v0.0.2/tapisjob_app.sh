@@ -9,6 +9,34 @@ source ./job_utils.sh
 # Job utils function
 setup_tapis_job
 
+cleanup() {
+    cd 16S-pipeline-app-v0.0.2 2>/dev/null || cd .
+    
+    echo "Compressing output folders"
+    tar -czf ../nextflow_work_debug.tar.gz work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log -C .. tapisjob.env 2>/dev/null || true
+
+    mkdir -p filtering_and_denoising_steps 2>/dev/null || true
+    cd 16S-pipeline_outputs/Misc 2>/dev/null && mv 1-* 2-* 3-* ../../filtering_and_denoising_steps 2>/dev/null || true
+    cd ../.. 2>/dev/null || cd .
+    tar -czf ../filtering_and_denoising_steps.tar.gz filtering_and_denoising_steps 2>/dev/null || true
+    tar -cf ../16S-pipeline_outputs.tar 16S-pipeline_outputs 2>/dev/null || true
+
+    echo "Cleaning up"
+    rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads src .nextflow .nextflow.log 2>/dev/null || true
+    rm -rf ${reads_no_ext} 2>/dev/null || true
+    cd ../
+    rm -rf metadata validate_metadata.sh 16S-pipeline-app-v0.0.2 tapis_files.tar job_utils.sh tapisjob.env tapisjob.sh tapisjob_app.sh 2>/dev/null || true
+    
+    # Job utils function
+    if [ ${nextflow_exit_code:-1} -ne 0 ]; then
+        fail_job
+    else
+        complete_job
+    fi
+}
+
+trap cleanup EXIT
+
 cd 16S-pipeline-app-v0.0.2
 
 for f in $(ls *.tar.gz); do
@@ -106,6 +134,14 @@ else
     read_path="${PWD}/reads/${suffix}"
 fi
 
+# Validate metadata against reads
+echo "Validating metadata..."
+if ! bash ./validate_metadata.sh "$read_dir"; then
+    echo "ERROR: Number of samples in metadata does not match number of FASTQ files in reads directory"
+    echo "Check that each metadata row has corresponding FASTQ files (paired-end: _R1/_R2, single-end: _R1)"
+    exit 1
+fi
+
 cd 16S-pipeline-app-v0.0.2 
 
 args=(-profile "${conf}" "${args[@]}")
@@ -114,7 +150,7 @@ args=(-profile "${conf}" "${args[@]}")
 args+=("--referenceAln" "${PWD}/${db_aln}")
 args+=("--referenceTax" "${PWD}/${db_tax}")
 
-echo "args: ${args[@]}"]
+echo "args: ${args[@]}"
 echo "reads: $read_path"
 ls $read_dir
 
@@ -127,25 +163,4 @@ if [ $nextflow_exit_code -eq 0 ]; then
     echo "Run completed successfully"
 else
     echo "Run failed with exit code $nextflow_exit_code"
-fi
-     
-echo "Compressing output folders"
-tar -cf ../nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log -C .. tapisjob.env
-
-mkdir filtering_and_denoising_steps
-cd 16S-pipeline_outputs/Misc ; mv 1-* 2-* 3-* ../../filtering_and_denoising_steps ; cd ../..
-tar -cf ../filtering_and_denoising_steps.tar filtering_and_denoising_steps
-tar -cf ../16S-pipeline_outputs.tar 16S-pipeline_outputs
-
-echo "Cleaning up"
-rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads src .nextflow .nextflow.log ../16S-pipeline-app-v0.0.2
-rm -rf ${reads_no_ext}
-cd ../
-rm -rf tapis_files.tar job_utils.sh tapisjob.env  tapisjob.sh  tapisjob_app.sh
-
-# Job utils function
-if [ $nextflow_exit_code -ne 0 ]; then
-    fail_job
-else
-    complete_job
 fi

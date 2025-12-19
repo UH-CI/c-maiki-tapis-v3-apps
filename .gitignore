@@ -7,3 +7,4 @@ ampliseq-16S-pipeline-app-v0.2/ampliseq-16S-pipeline-app-v0.2/dbs/*
 .DS_Store
 .ipynb_checkpoints/
 __pycache__/
+test-data/
