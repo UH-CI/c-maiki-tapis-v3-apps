@@ -48,12 +48,14 @@ init_tapis_vars() {
 # }
 
 # Archive job outputs if archive system differs from execution system
-archive_job_outputs() {
-    if [ -n "$archive_system_dir" ] && [ -n "$exec_output_dir" ] && [ "$archive_system_dir" != "$exec_output_dir" ]; then
-        echo "Archiving job outputs from $exec_output_dir to $archive_system_dir"
-        cp -r "$exec_output_dir" "$archive_system_dir/" 2>/dev/null || true
-    fi
-}
+# archive_job_outputs() {
+#     if [ -n "$archive_system_dir" ] && [ -n "$exec_output_dir" ] && [ "$archive_system_dir" != "$exec_output_dir" ]; then
+#         echo "Archiving job outputs from $exec_output_dir to $archive_system_dir"
+#         cp -r "$exec_output_dir" "$archive_system_dir"
+#         # Delete everything except tapisjob.out
+#         find . -mindepth 1 ! -name 'tapisjob.out' -exec rm -rf {} + 2>/dev/null || true
+#     fi
+# }
 
 # Standard cleanup function
 cleanup_job() {
@@ -63,7 +65,7 @@ cleanup_job() {
     chmod -R g+w "$PWD" 2>/dev/null || true
     
     # Archive outputs if needed
-    archive_job_outputs
+    # archive_job_outputs
     
     # # Check if script is exiting due to an error and update job status accordingly
     # exit_code=$?
