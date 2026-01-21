@@ -15,10 +15,10 @@ cleanup() {
     cd ITS-pipeline-app-v2.0/ 2>/dev/null || cd .
     
     echo "Compressing output folders"
-    tar -czf ../nextflow_work_debug.tar.gz work ./conf/${conf}.config ./src/nextflow.config .nextflow.log -C .. tapisjob.env 2>/dev/null || true
+    tar -cf ../nextflow_work_debug.tar work ./conf/${conf}.config ./src/nextflow.config .nextflow.log -C .. tapisjob.env 2>/dev/null || true
     tar -cf ../ITS-pipeline_outputs.tar ITS-pipeline_outputs 2>/dev/null || true
     
-    mv ../nextflow_work_debug.tar.gz ../ITS-pipeline_outputs.tar ../ 2>/dev/null || true
+    mv ../nextflow_work_debug.tar ../ITS-pipeline_outputs.tar ../ 2>/dev/null || true
     
     echo "Cleaning up"
     cd ../

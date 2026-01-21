@@ -57,12 +57,28 @@ init_tapis_vars() {
 #     fi
 # }
 
+# Rename job directory by prepending job_name to the directory name
+rename_job_dir() {
+    if [ -n "$job_name" ]; then
+        parent_dir="$(dirname "$PWD")"
+        current_dir="$(basename "$PWD")"
+        new_dir="${parent_dir}/${job_name}_${current_dir}"
+        
+        # Only rename if the directory doesn't already have the job_name prefix
+        if [[ "$current_dir" != "${job_name}_"* ]]; then
+            mv "$PWD" "$new_dir" 2>/dev/null || true
+        fi
+    fi
+}
+
 # Standard cleanup function
 cleanup_job() {
     # ONLY FOR DEV. REMOVE IN PROD
     # Add group write permissions
     chmod g+w "$(dirname "$PWD")" 2>/dev/null || true
     chmod -R g+w "$PWD" 2>/dev/null || true
+
+    # rename_job_dir
     
     # Archive outputs if needed
     # archive_job_outputs

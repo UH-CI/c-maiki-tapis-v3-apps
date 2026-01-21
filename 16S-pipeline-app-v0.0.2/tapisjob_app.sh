@@ -13,12 +13,12 @@ cleanup() {
     cd 16S-pipeline-app-v0.0.2 2>/dev/null || cd .
     
     echo "Compressing output folders"
-    tar -czf ../nextflow_work_debug.tar.gz work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log -C .. tapisjob.env 2>/dev/null || true
+    tar -cf ../nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log -C .. tapisjob.env 2>/dev/null || true
 
     mkdir -p filtering_and_denoising_steps 2>/dev/null || true
     cd 16S-pipeline_outputs/Misc 2>/dev/null && mv 1-* 2-* 3-* ../../filtering_and_denoising_steps 2>/dev/null || true
     cd ../.. 2>/dev/null || cd .
-    tar -czf ../filtering_and_denoising_steps.tar.gz filtering_and_denoising_steps 2>/dev/null || true
+    tar -cf ../filtering_and_denoising_steps.tar filtering_and_denoising_steps 2>/dev/null || true
     tar -cf ../16S-pipeline_outputs.tar 16S-pipeline_outputs 2>/dev/null || true
 
     echo "Cleaning up"

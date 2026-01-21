@@ -16,10 +16,10 @@ cleanup() {
     cd ampliseq-16S-pipeline-app-v0.2/ 2>/dev/null || cd .
     
     echo "Compressing output folders"
-    tar -czf nextflow_work_debug.tar.gz ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log -C .. tapisjob.env 2>/dev/null || true
+    tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log -C .. tapisjob.env 2>/dev/null || true
     tar -cf ampliseq_16S_pipeline_outputs.tar ./ampliseq_16S_pipeline_outputs 2>/dev/null || true
     
-    mv nextflow_work_debug.tar.gz ampliseq_16S_pipeline_outputs.tar ../ 2>/dev/null || true
+    mv nextflow_work_debug.tar ampliseq_16S_pipeline_outputs.tar ../ 2>/dev/null || true
     
     echo "Cleaning up"
     cd ../
