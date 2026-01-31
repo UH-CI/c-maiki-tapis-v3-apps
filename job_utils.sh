@@ -104,14 +104,14 @@ setup_tapis_job() {
 complete_job() {
     # update_job_status "Completed"
     # _job_status_set=true
-    echo "Done"
+    echo "Completed"
 }
 
 # Fail job with optional error message
 fail_job() {
     # update_job_status "Failed"
     # _job_status_set=true
-    echo "Done"
+    echo "Failed"
 }
 
 # Export functions
@@ -119,7 +119,7 @@ export -f init_tapis_vars
 # export -f create_job_info
 # export -f create_sequencing_entry
 # export -f update_job_status
-export -f archive_job_outputs
+# export -f archive_job_outputs
 export -f cleanup_job
 export -f setup_tapis_job
 export -f complete_job

@@ -26,9 +26,9 @@ while IFS= read -r filepath; do
     [ -z "$filepath" ] && continue
     filename=$(basename "$filepath")
     
-    if [[ "$filename" =~ ^(.+)_R1\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_1\.(fastq|fq)(\.gz)?$ ]]; then
+    if [[ "$filename" =~ ^(.+)_R1(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_1(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]]; then
         UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
-    elif [[ "$filename" =~ ^(.+)_R2\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_2\.(fastq|fq)(\.gz)?$ ]]; then
+    elif [[ "$filename" =~ ^(.+)_R2(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_2(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]]; then
         UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
     fi
 done <<< "$FASTQ_FILES"
@@ -41,6 +41,19 @@ echo "Sequence samples: $SEQUENCE_COUNT"
 if [ "$METADATA_COUNT" -ne "$SEQUENCE_COUNT" ]; then
     echo ""
     echo "Error: Count mismatch"
+    echo "Cleaning up after metadata validation failure..."
+    echo "# of files in reads: $(ls -1 reads 2>/dev/null | wc -l)"
+    echo "reads:"
+    ls reads
+    
+    KEEP_FILES=("metadata" "tapisjob.env" "tapisjob.out" "tapisjob.sh")
+
+    for item in *; do
+        if [[ ! " ${KEEP_FILES[@]} " =~ " ${item} " ]]; then
+            rm -rf "$item" 2>/dev/null || true
+        fi
+    done
+        
     exit 1
 fi
 

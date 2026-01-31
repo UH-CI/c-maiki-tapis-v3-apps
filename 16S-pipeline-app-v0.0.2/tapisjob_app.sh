@@ -10,7 +10,7 @@ source ./job_utils.sh
 setup_tapis_job
 
 cleanup() {
-    cd 16S-pipeline-app-v0.0.2 2>/dev/null || cd .
+    cd 16S-pipeline-app-v0.0.2 2>/dev/null
     
     echo "Compressing output folders"
     tar -cf ../nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log -C .. tapisjob.env 2>/dev/null || true
@@ -139,6 +139,8 @@ echo "Validating metadata..."
 if ! bash ./validate_metadata.sh "$read_dir"; then
     echo "ERROR: Number of samples in metadata does not match number of FASTQ files in reads directory"
     echo "Check that each metadata row has corresponding FASTQ files (paired-end: _R1/_R2, single-end: _R1)"
+    trap - EXIT
+    fail_job
     exit 1
 fi
 
