@@ -137,10 +137,7 @@ fi
 # Validate metadata against reads
 echo "Validating metadata..."
 if ! bash ./validate_metadata.sh "$read_dir"; then
-    echo "ERROR: Number of samples in metadata does not match number of FASTQ files in reads directory"
-    echo "Check that each metadata row has corresponding FASTQ files (paired-end: _R1/_R2, single-end: _R1)"
     trap - EXIT
-    fail_job
     exit 1
 fi
 

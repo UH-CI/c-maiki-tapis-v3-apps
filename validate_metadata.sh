@@ -20,6 +20,13 @@ cleanup_validation() {
     done
 }
 
+if [ ! -d "$METADATA_DIR" ]; then
+    echo "Error: Metadata directory not found: $METADATA_DIR" >&2
+    cleanup_validation
+    exit 1
+fi
+
+
 # Find metadata file in metadata directory
 METADATA_FILE=$(find "$METADATA_DIR" -maxdepth 1 -type f -name "*metadata*.xlsx" | head -n 1)
 if [ -z "$METADATA_FILE" ]; then
@@ -48,36 +55,54 @@ if [ -z "$SHEET_XML" ]; then
     exit 1
 fi
 
-METADATA_COUNT=$(echo "$SHEET_XML" | grep -o '<c r="A1[2-9][0-9]*"[^>]*><v>[^<]*</v></c>' | wc -l)
+METADATA_COUNT=$(echo "$SHEET_XML" | grep -o '<c r="A[0-9]\+"[^>]*><v>[^<]*</v></c>' | \
+    sed 's/.*r="A\([0-9]\+\)".*/\1/' | awk '$1 >= 12' | wc -l)
 
-# Count unique samples in reads directory
-declare -A UNIQUE_SAMPLES
-FASTQ_FILES=$(find "$READS_DIR" -maxdepth 1 -type f \( -name "*.fastq.gz" -o -name "*.fq.gz" -o -name "*.fastq" -o -name "*.fq" \))
-
-while IFS= read -r filepath; do
-    [ -z "$filepath" ] && continue
-    filename=$(basename "$filepath")
-    
-    if [[ "$filename" =~ ^(.+)_R1(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_1(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]]; then
-        UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
-    elif [[ "$filename" =~ ^(.+)_R2(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_2(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]]; then
-        UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
-    fi
-done <<< "$FASTQ_FILES"
-
-SEQUENCE_COUNT=${#UNIQUE_SAMPLES[@]}
-
-echo "Metadata samples: $METADATA_COUNT"
-echo "Sequence samples: $SEQUENCE_COUNT"
-
-if [ "$METADATA_COUNT" -ne "$SEQUENCE_COUNT" ]; then
-    echo ""
-    echo "Error: Count mismatch"
-    echo "reads:"
-    ls reads
+if [ "$METADATA_COUNT" -eq 0 ]; then
+    echo "Error: No metadata entries found in Excel file" >&2
     cleanup_validation
     exit 1
 fi
+
+# # Count unique samples in reads directory
+# declare -A UNIQUE_SAMPLES
+# FASTQ_FILES=$(find "$READS_DIR" -maxdepth 1 -type f \( -name "*.fastq.gz" -o -name "*.fq.gz" -o -name "*.fastq" -o -name "*.fq" \))
+
+# while IFS= read -r filepath; do
+#     [ -z "$filepath" ] && continue
+#     filename=$(basename "$filepath")
+    
+#     if [[ "$filename" =~ ^(.+)_R1(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_1(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]]; then
+#         UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
+#     elif [[ "$filename" =~ ^(.+)_R2(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]] || [[ "$filename" =~ ^(.+)_2(_[0-9]+)?\.(fastq|fq)(\.gz)?$ ]]; then
+#         UNIQUE_SAMPLES["${BASH_REMATCH[1]}"]=1
+#     fi
+# done <<< "$FASTQ_FILES"
+
+# SEQUENCE_COUNT=${#UNIQUE_SAMPLES[@]}
+
+echo "Metadata samples: $METADATA_COUNT"
+# echo "Sequence samples: $SEQUENCE_COUNT"
+
+# Check if any FASTQ files exist
+FASTQ_COUNT=$(find "$READS_DIR" -maxdepth 1 -type f \( -name "*.fastq.gz" -o -name "*.fq.gz" -o -name "*.fastq" -o -name "*.fq" \) | wc -l)
+
+if [ "$FASTQ_COUNT" -eq 0 ]; then
+    echo ""
+    echo "Error: No FASTQ files found in $READS_DIR" >&2
+    cleanup_validation
+    exit 1
+fi
+
+# if [ "$SEQUENCE_COUNT" -gt "$METADATA_COUNT" ]; then
+#     echo ""
+#     echo "Error: Insufficient metadata entries"
+#     echo "Expected at least $SEQUENCE_COUNT metadata entries (one per sample)"
+#     echo "Found only $METADATA_COUNT metadata entries"
+#     echo "Missing metadata for $((SEQUENCE_COUNT - METADATA_COUNT)) samples"
+#     cleanup_validation
+#     exit 1
+# fi
 
 echo "Validation passed"
 exit 0
