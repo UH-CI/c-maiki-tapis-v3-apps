@@ -5,13 +5,15 @@ set -e
 READS_DIR="${1:-reads}"
 METADATA_DIR="${2:-metadata}"
 
+VALIDATION_ERRORS="metadata_validation_errors.txt"
+
 # Cleanup function for all validation failures
 cleanup_validation() {
     echo ""
     echo "Cleaning up after metadata validation failure..."
     echo "# of files in reads: $(ls -1 reads 2>/dev/null | wc -l)"
     
-    KEEP_FILES=("metadata" "tapisjob.env" "tapisjob.out" "tapisjob.sh")
+    KEEP_FILES=("metadata" "tapisjob.env" "tapisjob.out" "tapisjob.sh" "$VALIDATION_ERRORS")
 
     for item in *; do
         if [[ ! " ${KEEP_FILES[@]} " =~ " ${item} " ]]; then
@@ -217,13 +219,18 @@ if [ "$TOTAL_FILES" -eq 0 ]; then
 fi
 
 if [ "${#UNMATCHED_FILES[@]}" -gt 0 ]; then
-    echo ""
-    echo "Error: ${#UNMATCHED_FILES[@]} of $TOTAL_FILES FASTQ file(s) have no matching metadata entry:" >&2
-    for f in "${UNMATCHED_FILES[@]}"; do
-        echo "  - $f" >&2
-    done
+    {
+        echo "Error: ${#UNMATCHED_FILES[@]} of $TOTAL_FILES FASTQ file(s) have no matching metadata entry:"
+        echo ""
+        for f in "${UNMATCHED_FILES[@]}"; do
+            echo "  - $f"
+        done
+        echo ""
+        echo "Ensure sample names in column A of the metadata file match the beginning of each filename."
+    } > "$VALIDATION_ERRORS"
     echo "" >&2
-    echo "Ensure sample names in column A of the metadata file match the beginning of each filename." >&2
+    echo "Error: ${#UNMATCHED_FILES[@]} of $TOTAL_FILES FASTQ file(s) have no matching metadata entry." >&2
+    echo "See $VALIDATION_ERRORS for details." >&2
     cleanup_validation
     exit 1
 fi
