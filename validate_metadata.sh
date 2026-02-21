@@ -77,10 +77,10 @@ done < <(
     echo "$SHEET_XML" | \
     # Put each cell element on its own line for easier processing
     sed 's/<c /\n<c /g' | \
-    grep 'r="A[0-9]' | \
+    grep 'r="B[0-9]' | \
     while IFS= read -r cell; do
-        # Pull the row number out of the cell reference (e.g. A12 -> 12)
-        row=$(echo "$cell" | sed 's/.*r="A\([0-9]\+\)".*/\1/')
+        # Pull the row number out of the cell reference (e.g. B12 -> 12)
+        row=$(echo "$cell" | sed 's/.*r="B\([0-9]\+\)".*/\1/')
         [ "$row" -lt 12 ] 2>/dev/null && continue
 
         if echo "$cell" | grep -q 't="s"'; then
