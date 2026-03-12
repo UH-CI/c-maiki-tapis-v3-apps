@@ -51,8 +51,12 @@ while [[ "$#" -gt 0 ]]; do
         --RV_primer) RV_primer="$2"; shift ;;
         # --metadata) metadata=1 ;;
         --metadata) 
-            tapis_url="${2#tapis://}"
-            metadata="${_tapisSysRootDir}/${tapis_url#*/}"
+            if [[ "$2" == tapis://* ]]; then
+                tapis_url="${2#tapis://}"
+                metadata="${_tapisSysRootDir}/${tapis_url#*/}"
+            else
+                metadata="$2"
+            fi
             shift ;;
         --skip_cutadapt) skip_cutadapt=1 ;;
         --cut_its) cut_its="$2"; shift ;;
