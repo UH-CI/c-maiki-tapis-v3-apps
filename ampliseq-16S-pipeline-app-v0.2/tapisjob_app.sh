@@ -49,14 +49,11 @@ while [[ "$#" -gt 0 ]]; do
         # --input_fasta) input_fasta="$2"; shift ;;
         --FW_primer) FW_primer="$2"; shift ;;
         --RV_primer) RV_primer="$2"; shift ;;
-        --metadata) metadata=1 ;;
-        # --metadata) 
-        #     if [[ "$2" == tapis://cmaiki-v2-dev-koa-hpc/* ]]; then
-        #         metadata="${2#tapis://cmaiki-v2-dev-koa-hpc}"
-        #     else
-        #         metadata="$2"
-        #     fi
-        #     shift ;;
+        # --metadata) metadata=1 ;;
+        --metadata) 
+            tapis_url="${2#tapis://}"
+            metadata="${_tapisSysRootDir}/${tapis_url#*/}"
+            shift ;;
         --skip_cutadapt) skip_cutadapt=1 ;;
         --save_intermediates) save_intermediates=1 ;;
         --single_end) single_end=1 ;;
@@ -135,30 +132,30 @@ if ! bash ./validate_metadata.sh "$read_path"; then
     exit 1
 fi
 
-# Convert metadata to tsv if user specifies for use in ampliseq
-if [[ "$metadata" -eq 1 ]]; then
-    metadata_xlsx=$(find ./metadata -maxdepth 1 -type f -name "*.xlsx" | head -1)
-    metadata_tsv="${PWD}/metadata.tsv"
+# # Convert metadata to tsv if user specifies for use in ampliseq
+# if [[ "$metadata" -eq 1 ]]; then
+#     metadata_xlsx=$(find ./metadata -maxdepth 1 -type f -name "*.xlsx" | head -1)
+#     metadata_tsv="${PWD}/metadata.tsv"
     
-    echo "Converting metadata using Apptainer..."
+#     echo "Converting metadata using Apptainer..."
     
-    # Get absolute paths for bind mounting
-    metadata_dir=$(dirname "$(realpath "$metadata_xlsx")")
-    output_dir=$(dirname "$(realpath "$metadata_tsv")")
-    script_dir="${PWD}"
+#     # Get absolute paths for bind mounting
+#     metadata_dir=$(dirname "$(realpath "$metadata_xlsx")")
+#     output_dir=$(dirname "$(realpath "$metadata_tsv")")
+#     script_dir="${PWD}"
     
-    # Use local packaged container
-    if ! singularity exec \
-        --bind "${metadata_dir}:/input:ro" \
-        --bind "${output_dir}:/output:rw" \
-        --bind "${script_dir}:/scripts:ro" \
-        ./python-openpyxl.sif \
-        python3 /scripts/convert_metadata.py /input/$(basename "$metadata_xlsx") /output/$(basename "$metadata_tsv"); then
-        echo "ERROR: Failed to convert metadata file"
-        exit 1
-    fi
+#     # Use local packaged container
+#     if ! singularity exec \
+#         --bind "${metadata_dir}:/input:ro" \
+#         --bind "${output_dir}:/output:rw" \
+#         --bind "${script_dir}:/scripts:ro" \
+#         ./python-openpyxl.sif \
+#         python3 /scripts/convert_metadata.py /input/$(basename "$metadata_xlsx") /output/$(basename "$metadata_tsv"); then
+#         echo "ERROR: Failed to convert metadata file"
+#         exit 1
+#     fi
     
-fi
+# fi
 
 args+=(
     --input_folder "${read_path}"
@@ -169,10 +166,11 @@ args+=(
 [[ -n "$FW_primer" ]] && args+=(--FW_primer "$FW_primer")
 [[ -n "$RV_primer" ]] && args+=(--RV_primer "$RV_primer")
 
+[[ -n "$metadata" ]] && args+=(--metadata "$metadata")
 # Add metadata TSV file if it was converted
-if [[ "$metadata" -eq 1 && -f "${PWD}/metadata.tsv" ]]; then
-    args+=(--metadata "${PWD}/metadata.tsv")
-fi
+# if [[ "$metadata" -eq 1 && -f "${PWD}/metadata.tsv" ]]; then
+#     args+=(--metadata "${PWD}/metadata.tsv")
+# fi
 
 # [[ -n "$metadata" ]] && args+=(--metadata "$metadata")
 [[ -n "$extension" ]] && args+=(--extension "$extension")

@@ -47,7 +47,7 @@ if [ ! -d "$READS_DIR" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Parse Excel: extract sample names (column A, rows 12+)
+# Parse Excel: extract samp_name values (column B, rows 12+)
 # ---------------------------------------------------------------------------
 SHEET_XML=$(unzip -p "$METADATA_FILE" xl/worksheets/sheet1.xml 2>/dev/null)
 if [ -z "$SHEET_XML" ]; then
@@ -69,7 +69,7 @@ if [ -n "$SHARED_STRINGS_XML" ]; then
         sed 's|<t>\(.*\)</t>|\1|; s|<t/>||')
 fi
 
-# Extract sample names from column A cells at row >= 12
+# Extract samp_name values from column B cells at row >= 12
 declare -a METADATA_NAMES=()
 while IFS= read -r line; do
     [ -n "$line" ] && METADATA_NAMES+=("$line")
@@ -194,6 +194,8 @@ while IFS= read -r filepath; do
             remainder="${norm_base#$norm_meta}"
             if is_valid_remainder "$remainder"; then
                 matched=1
+                # FOR DEBUG: 
+                # echo "  MATCH: $filename -> $meta_name"
                 break
             fi
         fi
@@ -201,6 +203,8 @@ while IFS= read -r filepath; do
 
     if [ "$matched" -eq 0 ]; then
         UNMATCHED_FILES+=("$filename")
+        # FOR DEBUG: 
+        # echo "  NO MATCH: $filename (normalized: $norm_base)"
     fi
 
 done < <(find "$READS_DIR" -maxdepth 1 -type f \( \
@@ -226,7 +230,7 @@ if [ "${#UNMATCHED_FILES[@]}" -gt 0 ]; then
             echo "  - $f"
         done
         echo ""
-        echo "Ensure sample names in column A of the metadata file match the beginning of each filename."
+        echo "Ensure sample names in column B (samp_name) of the metadata file match the beginning of each filename."
     } > "$VALIDATION_ERRORS"
     echo "" >&2
     echo "Error: ${#UNMATCHED_FILES[@]} of $TOTAL_FILES FASTQ file(s) have no matching metadata entry." >&2
