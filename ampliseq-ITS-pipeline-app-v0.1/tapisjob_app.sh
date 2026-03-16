@@ -68,7 +68,7 @@ while [[ "$#" -gt 0 ]]; do
         --single_end) single_end=1 ;;
         --illumina_pe_its) illumina_pe_its=1 ;;
         --multiple_sequencing_runs) multiple_sequencing_runs=1 ;;
-        # --extension) extension="$2"; shift ;;
+        --extension) extension="$2"; shift ;;
         --min_read_counts) min_read_counts="$2"; shift ;;
         --ignore_empty_input_files) ignore_empty_input_files=1 ;;
         --ignore_failed_trimming) ignore_failed_trimming=1 ;;
