@@ -87,7 +87,10 @@ while [[ "$#" -gt 0 ]]; do
         --dada_ref_tax_custom) dada_ref_tax_custom="$2"; shift ;;
         --dada_ref_tax_custom_sp) dada_ref_tax_custom_sp="$2"; shift ;;
         --dada_assign_taxlevels) dada_assign_taxlevels="$2"; shift ;;
+        --dada_assign_chunksize) dada_assign_chunksize="$2"; shift ;;
         --dada_taxonomy_rc) dada_taxonomy_rc=1 ;;
+        --qiime_ref_taxonomy) qiime_ref_taxonomy="$2"; shift ;;
+        --qiime_ref_tax_custom) qiime_ref_tax_custom="$2"; shift ;;
 
         # For future development
         # --pplace_tree) pplace_tree="$2"; shift ;;
@@ -203,10 +206,23 @@ fi
 [[ -n "$cutadapt_max_error_rate" ]] && args+=(--cutadapt_max_error_rate "$cutadapt_max_error_rate")
 [[ -n "$sample_inference" ]] && args+=(--sample_inference "$sample_inference")
 [[ -n "$vsearch_cluster_id" ]] && args+=(--vsearch_cluster_id "$vsearch_cluster_id")
+# Hopefully temporary while ampliseq is unable to retrieve Silva files
+# if [[ "$dada_ref_taxonomy" == "silva=138.1" ]]; then
+#     # Use Silva files packaged with app --dada_ref_taxonomy
+#     args+=(--dada_ref_tax_custom_sp "./dbs/silva_species_assignment_v138.1.fa.gz")
+#     args+=(--dada_ref_tax_custom "./dbs/silva_nr99_v138.1_wSpecies_train_set.fa.gz")
+# else
+#     [[ -n "$dada_ref_taxonomy" ]] && args+=(--dada_ref_taxonomy "$dada_ref_taxonomy")
+# fi
+
 [[ -n "$dada_ref_taxonomy" ]] && args+=(--dada_ref_taxonomy "$dada_ref_taxonomy")
 [[ -n "$dada_ref_tax_custom" ]] && args+=(--dada_ref_tax_custom "$dada_ref_tax_custom")
 [[ -n "$dada_ref_tax_custom_sp" ]] && args+=(--dada_ref_tax_custom_sp "$dada_ref_tax_custom_sp")
 [[ -n "$dada_assign_taxlevels" ]] && args+=(--dada_assign_taxlevels "$dada_assign_taxlevels")
+[[ -n "$dada_assign_chunksize" ]] && args+=(--dada_assign_chunksize "$dada_assign_chunksize")
+
+[[ -n "$qiime_ref_taxonomy" ]] && args+=(--qiime_ref_taxonomy "$qiime_ref_taxonomy")
+[[ -n "$qiime_ref_tax_custom" ]] && args+=(--qiime_ref_tax_custom "$qiime_ref_tax_custom")
 
 # Future Development
 # [[ -n "$pplace_tree" ]] && args+=(--pplace_tree "$pplace_tree")
@@ -241,8 +257,6 @@ fi
 [[ "$skip_dada_taxonomy" -eq 1 ]] && args+=(--skip_dada_taxonomy)
 [[ "$skip_alpha_rarefaction" -eq 1 ]] && args+=(--skip_alpha_rarefaction)
 [[ "$skip_diversity_indices" -eq 1 ]] && args+=(--skip_diversity_indices)
-
-[[ -n "$dada_ref_tax_custom_sp" ]] && args+=(--dada_ref_tax_custom_sp "$dada_ref_tax_custom_sp")
 
 # # Remove FW_primer and RV_primer from args if skip_cutadapt is set
 # if [[ "$skip_cutadapt" -eq 1 ]]; then
