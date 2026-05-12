@@ -207,7 +207,7 @@ while IFS= read -r filepath; do
         # echo "  NO MATCH: $filename (normalized: $norm_base)"
     fi
 
-done < <(find "$READS_DIR" -maxdepth 1 -type f \( \
+done < <(find "$READS_DIR" -type f \( \
     -name "*.fastq.gz" -o -name "*.fq.gz" \
     -o -name "*.fastq"  -o -name "*.fq" \))
 
