@@ -194,12 +194,13 @@ workflow demux_pipeline {
         .splitFastq(by: params.n_per_file.toInteger(), file: true, pe: !params.singleEnd)
         .map { [it[0], it[1..-1]] }
 
-    SPLITS = IDX_SPLIT
+    INPUT_IDX_SPLIT = IDX_SPLIT
+        .toList()
+        .flatMap { list -> list.withIndex().collect { item, idx -> [idx + 1] + item } }
 
-    COUNTER = SPLITS.count().map { 1..it }.flatten()
-
-    INPUT_IDX_SPLIT = COUNTER.combine(IDX_SPLIT)
-    INPUT_SEQ_SPLIT = COUNTER.combine(SEQ_SPLIT)
+    INPUT_SEQ_SPLIT = SEQ_SPLIT
+        .toList()
+        .flatMap { list -> list.withIndex().collect { item, idx -> [idx + 1] + item } }
 
     To_h5(INPUT_IDX_SPLIT)
 
@@ -219,7 +220,7 @@ workflow demux_pipeline {
 }
 
 workflow {
-    inputdir = Channel.fromFilePairs(params.inputdir, size: params.singleEnd ? 2 : 1)
+    inputdir = Channel.fromFilePairs(params.inputdir, size: params.singleEnd ? 1 : 2)
         .map{[ [id: it[0]], it[1] ]}
     indexes = Channel.fromFilePairs("${params.inputdir}/*_I{1,2}*.fastq*", size: params.singleBarcoded ? 1 : 2 , flat: true)
     meta = Channel.fromPath("${params.inputdir}/*.csv")
