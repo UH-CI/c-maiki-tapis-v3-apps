@@ -19,7 +19,8 @@ cleanup() {
     cd 16S-pipeline_outputs/Misc 2>/dev/null && mv 1-* 2-* 3-* ../../filtering_and_denoising_steps 2>/dev/null || true
     cd ../.. 2>/dev/null || cd .
     tar -cf ../filtering_and_denoising_steps.tar filtering_and_denoising_steps 2>/dev/null || true
-    tar -cf ../16S-pipeline_outputs.tar 16S-pipeline_outputs 2>/dev/null || true
+    tar --exclude=16S-pipeline_outputs/Misc -cf ../16S-pipeline_outputs.tar 16S-pipeline_outputs 2>/dev/null || true
+    tar -cf ../16S-pipeline_midpoints.tar 16S-pipeline_outputs/Misc 2>/dev/null || true
 
     echo "Cleaning up"
     rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads src .nextflow .nextflow.log 2>/dev/null || true
@@ -101,7 +102,7 @@ fi
 taxaBlackList=()
 [ ${removeUnknown} -eq 1 ] && taxaBlackList+=('unknown;')
 [ ${removeMitochondria} -eq 1 ] && taxaBlackList+=('Bacteria;Proteobacteria;Alphaproteobacteria;Rickettsiales;Mitochondria;')
-[ ${removeChloroplasts} -eq 1 ] && taxaBlackList+=('Bacteria;Cyanobacteria;Oxyphotobacteria;Chloroplast;')
+[ ${removeChloroplasts} -eq 1 ] && taxaBlackList+=('Bacteria;Cyanobacteria;Cyanobacteriia;Chloroplast;')
 [ ! -z ${taxaToFilter} ] && taxaBlackList+=($(echo "${taxaToFilter}" | xargs echo -n | sed 's/,/;/g'))
 
 IFS='-' eval 'taxaToFilterAll="${taxaBlackList[*]}"'
