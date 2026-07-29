@@ -74,10 +74,12 @@ while [[ "$#" -gt 0 ]]; do
         --ignore_failed_trimming) ignore_failed_trimming=1 ;;
         # --trunclenf) trunclenf="$2"; shift ;;
         # --trunclenr) trunclenr="$2"; shift ;;
-        --trunc_qmin) trunc_qmin="2"; shift ;;
+        --trunc_qmin) trunc_qmin="$2"; shift ;;
+        --trunc_rmin) trunc_rmin="$2"; shift ;;
         --max_ee) max_ee="$2"; shift ;;
         --min_len) min_len="$2"; shift ;;
         --ignore_failed_filtering) ignore_failed_filtering=1 ;;
+        --retain_untrimmed) retain_untrimmed=1 ;;
         --vsearch_cluster) vsearch_cluster=1 ;;
         --vsearch_cluster_id) vsearch_cluster_id="$2"; shift ;;
         --dada_ref_taxonomy) dada_ref_taxonomy="$2"; shift ;;
@@ -102,24 +104,19 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# First test for conditional setting of one arg based on another
-# -- cut_its set to none unless pacbio has been selected
-if [[ -z "$pacbio" ]]; then
-    cut_its="none"
-    args+=(--cut_its "$cut_its")
-elif [[ ! -z "$cut_its" && "$cut_its" != "none" ]]; then
-    args+=(--cut_its "$cut_its")
-fi
+# -- cut_its defaults to none unless the user has explicitly set it
+[[ -z "$cut_its" ]] && cut_its="none"
+args+=(--cut_its "$cut_its")
 
 if [[ "$illumina_pe_its" -eq 1 || "$illumina_novaseq" -eq 1 ]]; then
     [[ "$illumina_pe_its" -eq 1 ]] && args+=(--illumina_pe_its)
     [[ "$illumina_novaseq" -eq 1 ]] && args+=(--illumina_novaseq)
-    extension="/*_R{1,2}.fastq.gz"
+    [[ -z "$extension" ]] && extension="/*_R{1,2}.fastq.gz"
 elif [[ "$pacbio" -eq 1 || "$iontorrent" -eq 1 || "$single_end" -eq 1 ]]; then
     [[ "$pacbio" -eq 1 ]] && args+=(--pacbio)
     [[ "$iontorrent" -eq 1 ]] && args+=(--iontorrent)
     [[ "$single_end" -eq 1 ]] && args+=(--single_end)
-    extension="/*_R1.fastq.gz"
+    [[ -z "$extension" ]] && extension="/*_R1.fastq.gz"
 fi
 
 # Check for tar files in reads
@@ -193,6 +190,7 @@ args+=(
 [[ -n "$trunclenf" ]] && args+=(--trunclenf "$trunclenf")
 [[ -n "$trunclenr" ]] && args+=(--trunclenr "$trunclenr")
 [[ -n "$trunc_qmin" ]] && args+=(--trunc_qmin "$trunc_qmin")
+[[ -n "$trunc_rmin" ]] && args+=(--trunc_rmin "$trunc_rmin")
 [[ -n "$max_ee" ]] && args+=(--max_ee "$max_ee")
 [[ -n "$min_len" ]] && args+=(--min_len "$min_len")
 [[ -n "$vsearch_cluster_id" ]] && args+=(--vsearch_cluster_id "$vsearch_cluster_id")
@@ -210,6 +208,7 @@ args+=(
 [[ "$ignore_empty_input_files" -eq 1 ]] && args+=(--ignore_empty_input_files)
 [[ "$ignore_failed_trimming" -eq 1 ]] && args+=(--ignore_failed_trimming)
 [[ "$ignore_failed_filtering" -eq 1 ]] && args+=(--ignore_failed_filtering)
+[[ "$retain_untrimmed" -eq 1 ]] && args+=(--retain_untrimmed)
 [[ "$vsearch_cluster" -eq 1 ]] && args+=(--vsearch_cluster)
 [[ "$dada_taxonomy_rc" -eq 1 ]] && args+=(--dada_taxonomy_rc)
 [[ "$picrust" -eq 1 ]] && args+=(--picrust)

@@ -59,6 +59,8 @@ while [[ "$#" -gt 0 ]]; do
             fi
             shift ;;
         --skip_cutadapt) skip_cutadapt=1 ;;
+        --cut_its) cut_its="$2"; shift ;;
+        --its_partial) its_partial="$2"; shift ;;
         --save_intermediates) save_intermediates=1 ;;
         --illumina_novaseq) illumina_novaseq=1 ;;
         --pacbio) pacbio=1 ;;
@@ -119,15 +121,19 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
+# -- cut_its defaults to none unless the user has explicitly set it
+[[ -z "$cut_its" ]] && cut_its="none"
+args+=(--cut_its "$cut_its")
+
 if [[ "$illumina_pe_its" -eq 1 || "$illumina_novaseq" -eq 1 ]]; then
     [[ "$illumina_pe_its" -eq 1 ]] && args+=(--illumina_pe_its)
     [[ "$illumina_novaseq" -eq 1 ]] && args+=(--illumina_novaseq)
-    extension="/*_R{1,2}.fastq.gz"
+    [[ -z "$extension" ]] && extension="/*_R{1,2}.fastq.gz"
 elif [[ "$pacbio" -eq 1 || "$iontorrent" -eq 1 || "$single_end" -eq 1 ]]; then
     [[ "$pacbio" -eq 1 ]] && args+=(--pacbio)
     [[ "$iontorrent" -eq 1 ]] && args+=(--iontorrent)
     [[ "$single_end" -eq 1 ]] && args+=(--single_end)
-    extension="/*_R1.fastq.gz"
+    [[ -z "$extension" ]] && extension="/*_R1.fastq.gz"
 fi
 
 # Check for tar files in reads
@@ -193,6 +199,7 @@ fi
 
 # [[ -n "$metadata" ]] && args+=(--metadata "$metadata")
 [[ -n "$extension" ]] && args+=(--extension "$extension")
+[[ -n "$its_partial" ]] && args+=(--its_partial "$its_partial")
 [[ -n "$min_read_counts" ]] && args+=(--min_read_counts "$min_read_counts")
 [[ -n "$trunclenf" ]] && args+=(--trunclenf "$trunclenf")
 [[ -n "$trunclenr" ]] && args+=(--trunclenr "$trunclenr")

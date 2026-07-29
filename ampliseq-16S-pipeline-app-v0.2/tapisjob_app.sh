@@ -109,12 +109,12 @@ done
 if [[ "$illumina_pe_its" -eq 1 || "$illumina_novaseq" -eq 1 ]]; then
     [[ "$illumina_pe_its" -eq 1 ]] && args+=(--illumina_pe_its)
     [[ "$illumina_novaseq" -eq 1 ]] && args+=(--illumina_novaseq)
-    extension="/*_R{1,2}.fastq.gz"
+    [[ -z "$extension" ]] && extension="/*_R{1,2}.fastq.gz"
 elif [[ "$pacbio" -eq 1 || "$iontorrent" -eq 1 || "$single_end" -eq 1 ]]; then
     [[ "$pacbio" -eq 1 ]] && args+=(--pacbio)
     [[ "$iontorrent" -eq 1 ]] && args+=(--iontorrent)
     [[ "$single_end" -eq 1 ]] && args+=(--single_end)
-    extension="/*_R1.fastq.gz"
+    [[ -z "$extension" ]] && extension="/*_R1.fastq.gz"
 fi
 
 # Check for tar files in reads
