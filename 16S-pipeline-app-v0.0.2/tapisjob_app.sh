@@ -99,10 +99,11 @@ fi
 [ ! -z ${customSubsamplingLevel} ] && args+=(--customSubsamplingLevel ${customSubsamplingLevel})
 [ ${skipSubsampling:-0} -eq 1 ] && args+=(--skipSubsampling)
 
+# Match the taxon name alone, not the full lineage
 taxaBlackList=()
-[ ${removeUnknown} -eq 1 ] && taxaBlackList+=('unknown;')
-[ ${removeMitochondria} -eq 1 ] && taxaBlackList+=('Bacteria;Proteobacteria;Alphaproteobacteria;Rickettsiales;Mitochondria;')
-[ ${removeChloroplasts} -eq 1 ] && taxaBlackList+=('Bacteria;Cyanobacteria;Cyanobacteriia;Chloroplast;')
+[ ${removeUnknown} -eq 1 ] && taxaBlackList+=('unknown')
+[ ${removeMitochondria} -eq 1 ] && taxaBlackList+=('Mitochondria')
+[ ${removeChloroplasts} -eq 1 ] && taxaBlackList+=('Chloroplast')
 [ ! -z ${taxaToFilter} ] && taxaBlackList+=($(echo "${taxaToFilter}" | xargs echo -n | sed 's/,/;/g'))
 
 IFS='-' eval 'taxaToFilterAll="${taxaBlackList[*]}"'
