@@ -93,9 +93,7 @@ process IndexMapping {
     stageInMode "copy"
     
     input:
-    tuple val(split), path(h5)
-    path model
-    path meta
+    tuple val(split), path(h5), path(model), path(meta)
 
     output:
     tuple val(split), path("demux_info*.tsv"), emit: demux_info
@@ -206,7 +204,7 @@ workflow demux_pipeline {
 
     ErrorModel(To_h5.out.h5_files_for_error_model.collect(), GuessMatchOrder.out.barcodes_file)
 
-    IndexMapping(To_h5.out.h5_files, ErrorModel.out.error_model, GuessMatchOrder.out.barcodes_file)
+    IndexMapping(To_h5.out.h5_files.combine(ErrorModel.out.error_model.combine(GuessMatchOrder.out.barcodes_file)))
 
     SampleSizeDistribution(IndexMapping.out.sample_counts.collect())
 
