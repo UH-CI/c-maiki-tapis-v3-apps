@@ -81,21 +81,9 @@ else
     pattern="*_R1"
 fi
 
-# Check for tar files in reads
-reads_no_ext=$(basename "${reads}" .tar)
-if [ "${reads_no_ext}" != "${reads}" ]; then
-    # Set path to reads dir within untarred file
-    read_path="${PWD}/${reads_no_ext}/reads"
-    # Check if the directory exists, extract tar file if not
-    if [ ! -d "$read_path" ]; then
-        # Create directory if it doesn't exist
-        mkdir -p "$read_path"
-        # Extract tar file to reads dir
-        tar -xf "${PWD}/${reads}" -C "$read_path"
-    fi
-else
-    read_path="${PWD}/reads"
-fi
+# Find reads dir and resolve inputs
+resolve_reads_dir reads || exit 1
+read_path="${reads_dir}"
 
 # Validate metadata against reads
 echo "Validating metadata..."
@@ -104,7 +92,7 @@ if ! bash ./validate_metadata.sh "$read_path"; then
     exit 1
 fi
 
-echo "args: ${args[@]}"
+print_args "${args[@]}"
 echo "reads: $read_path"
 ls $read_path
 

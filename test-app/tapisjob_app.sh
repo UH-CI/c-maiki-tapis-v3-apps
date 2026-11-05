@@ -19,15 +19,13 @@ done
 
 echo "Count: $count"
 
-# Build read_path based on single or double end and .tar
-reads_no_ext=$(basename "${reads}" .tar) # in case the reads are provided as a tar file
-if [ "${reads_no_ext}" != "${reads}" ]; then
-    read_dir="${PWD}/${reads_no_ext}/reads/"
-    read_path="${PWD}/${reads_no_ext}/reads/${suffix}"
-else
-    read_dir="${PWD}/reads/"
-    read_path="${PWD}/reads/${suffix}"
+# Find reads dir and resolve inputs
+if ! resolve_reads_dir reads; then
+    trap - EXIT
+    exit 1
 fi
+read_dir="${reads_dir}/"
+read_path="${reads_dir}/${suffix}"
 
 echo "reads: $read_path"
 ls $read_path

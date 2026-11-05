@@ -46,7 +46,7 @@ args=(
 [[ "$reverseComplement" -eq 1 ]] && args+=(--reverseComplement)
 [[ "$singleBarcoded" -eq 1 ]] && args+=(--singleBarcoded)
 
-echo "args: ${args[@]}"
+print_args "${args[@]}"
 
 read_path="${PWD}/reads"
 echo "read_path: $read_path"
@@ -69,9 +69,9 @@ fi
 echo "Compressing output folders"
 mv demultiplexed/*.html .
 tar -cf nextflow_work_debug.tar work ./conf/${conf}.config ./src/nextflow.config .nextflow.log  -C .. tapisjob.env
-tar -cf demultiplexed_outputs.tar ./demultiplexed
+tar -cf demultiplexed.tar demultiplexed
 
-mv demultiplexed_outputs.tar nextflow_work_debug.tar ../
+mv demultiplexed.tar nextflow_work_debug.tar ../
 
 echo "Cleaning up"
 cd ../

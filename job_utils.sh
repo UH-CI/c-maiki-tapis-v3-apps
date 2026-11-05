@@ -114,6 +114,58 @@ fail_job() {
     echo "Failed"
 }
 
+# Find the reads dir and untar tarball if needed
+# Sets reads_dir to the absolute path of the folder holding the forward read files
+resolve_reads_dir() {
+    local input="${1:-reads}"
+    local pattern="${2:-*_R1*.fastq*}"
+    local tarball r1_file
+
+    # If input is a single file, move it into a folder of the same name
+    if [ -f "$input" ]; then
+        mv "$input" "${input}.tar"
+        mkdir -p "$input"
+        mv "${input}.tar" "$input/"
+    fi
+
+    # If no reads directly inside, untar tarball
+    if ! ls "$input"/$pattern >/dev/null 2>&1; then
+        tarball="$input/demultiplexed.tar"
+        [ -f "$tarball" ] || tarball=$(find "$input" -maxdepth 1 -type f \( -name "*.tar" -o -name "*.tar.gz" -o -name "*.tgz" \) ! -name "nextflow_work_debug.tar" | head -1)
+        if [ -n "$tarball" ]; then
+            echo "Unpacking $(basename "$tarball")"
+            echo ""
+            tar -xf "$tarball" -C "$input" --warning=no-unknown-keyword && rm -f "$tarball"
+        fi
+    fi
+
+    # Use the folder holding the R1 reads
+    r1_file=$(find "$input" -type f -name "$pattern" | head -1)
+    if [ -z "$r1_file" ]; then
+        echo "ERROR: No read files ($pattern) found in $input"
+        echo ""
+        return 1
+    fi
+    reads_dir=$(cd "$(dirname "$r1_file")" && pwd)
+    echo "Reads folder: $reads_dir"
+    echo ""
+}
+
+# Print each flag with its value(s) on its own line
+print_args() {
+    local arg arg_line=""
+    echo "args:"
+    for arg in "$@"; do
+        if [[ "$arg" == -* && -n "$arg_line" ]]; then
+            echo "  ${arg_line}"
+            arg_line=""
+        fi
+        arg_line="${arg_line:+${arg_line} }${arg}"
+    done
+    [[ -n "$arg_line" ]] && echo "  ${arg_line}"
+    return 0
+}
+
 # Export functions
 export -f init_tapis_vars
 # export -f create_job_info
@@ -124,3 +176,5 @@ export -f cleanup_job
 export -f setup_tapis_job
 export -f complete_job
 export -f fail_job
+export -f resolve_reads_dir
+export -f print_args

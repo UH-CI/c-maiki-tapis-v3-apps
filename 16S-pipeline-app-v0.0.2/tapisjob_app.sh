@@ -24,7 +24,6 @@ cleanup() {
 
     echo "Cleaning up"
     rm -rf conf nf scripts 16S-pipeline_outputs work dbs* filtering_and_denoising_steps ../reads src .nextflow .nextflow.log 2>/dev/null || true
-    rm -rf ${reads_no_ext} 2>/dev/null || true
     cd ../
     rm -rf metadata validate_metadata.sh 16S-pipeline-app-v0.0.2 tapis_files.tar job_utils.sh tapisjob.env tapisjob.sh tapisjob_app.sh 2>/dev/null || true
     
@@ -87,6 +86,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
+# Pick the SILVA release 138.1 reference files (Mothur format) packaged in dbs/
 if [[ "$db" == "seed" ]]; then
     db_aln=$(ls dbs/silva.seed*/silva.seed*.align)
     db_tax=$(ls dbs/silva.seed*/silva.seed*.tax)
@@ -126,15 +126,10 @@ fi
 
 cd ../
 
-# Build read_path based on single or double end and .tar
-reads_no_ext=$(basename "${reads}" .tar) # in case the reads are provided as a tar file
-if [ "${reads_no_ext}" != "${reads}" ]; then
-    read_dir="${PWD}/${reads_no_ext}/reads/"
-    read_path="${PWD}/${reads_no_ext}/reads/${suffix}"
-else
-    read_dir="${PWD}/reads/"
-    read_path="${PWD}/reads/${suffix}"
-fi
+# Find reads dir and resolve inputs
+resolve_reads_dir reads || exit 1
+read_dir="${reads_dir}/"
+read_path="${reads_dir}/${suffix}"
 
 # Validate metadata against reads
 echo "Validating metadata..."
@@ -151,9 +146,12 @@ args=(-profile "${conf}" "${args[@]}")
 args+=("--referenceAln" "${PWD}/${db_aln}")
 args+=("--referenceTax" "${PWD}/${db_tax}")
 
-echo "args: ${args[@]}"
+echo ""
+print_args "${args[@]}"
+echo ""
 echo "reads: $read_path"
 ls $read_dir
+echo ""
 
 echo "Executing Nextflow run" 
 ./nf/nextflow run src/main.nf --reads "$read_path" ${args[*]}
