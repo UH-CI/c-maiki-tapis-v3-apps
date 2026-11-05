@@ -14,7 +14,8 @@ export NXF_OFFLINE=true
 
 cleanup() {
     cd ampliseq-16S-pipeline-app-v0.2/ 2>/dev/null || cd .
-    
+
+    print_section "Cleanup"
     echo "Compressing output folders"
     tar -cf nextflow_work_debug.tar ./work ./conf ./.nextflow/assets/nf-core/ampliseq/nextflow.config ./.nextflow.log -C .. tapisjob.env 2>/dev/null || true
     tar -cf ampliseq_16S_pipeline_outputs.tar ./ampliseq_16S_pipeline_outputs 2>/dev/null || true
@@ -120,11 +121,14 @@ fi
 # Find reads dir and resolve inputs
 # Forward read pattern from extension
 read_pattern=$(echo "${extension##*/}" | sed 's/{\([^,}]*\),[^}]*}/\1/')
+print_section "Reads"
 resolve_reads_dir reads "$read_pattern" || exit 1
 read_path="${reads_dir}"
+echo "read_path: $read_path"
+ls $read_path
 
 # Validate metadata against reads
-echo "Validating metadata..."
+print_section "Metadata check"
 if ! bash ./validate_metadata.sh "$read_path"; then
     trap - EXIT
     exit 1
@@ -259,13 +263,12 @@ fi
 #     args=("${new_args[@]}")
 # fi
 
+print_section "Settings"
 print_args "${args[@]}"
-echo "read_path: $read_path"
-ls $read_path
 
 cd ampliseq-16S-pipeline-app-v0.2/
 
-echo "Executing Nextflow run"
+print_section "Nextflow run"
 ./nextflow run nf-core/ampliseq "${args[@]}"
 nextflow_exit_code=$?
 

@@ -20,6 +20,7 @@ done
 echo "Count: $count"
 
 # Find reads dir and resolve inputs
+print_section "Reads"
 if ! resolve_reads_dir reads; then
     trap - EXIT
     exit 1
@@ -31,13 +32,14 @@ echo "reads: $read_path"
 ls $read_path
 
 # Validate metadata against reads
-echo "Validating metadata..."
+print_section "Metadata check"
 if ! bash ./validate_metadata.sh "$read_dir"; then
     trap - EXIT
     exit 1
 fi
 
 # Run test script
+print_section "Test run"
 bash test-app/test.sh "$count"
 test_exit_code=$?
 

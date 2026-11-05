@@ -13,7 +13,8 @@ export NXF_HOME=$PWD/ITS-pipeline-app-v2.0/.nextflow
 
 cleanup() {
     cd ITS-pipeline-app-v2.0/ 2>/dev/null || cd .
-    
+
+    print_section "Cleanup"
     echo "Compressing output folders"
     tar -cf ../nextflow_work_debug.tar work ./conf/${conf}.config ./src/nextflow.config .nextflow.log -C .. tapisjob.env 2>/dev/null || true
     tar -cf ../ITS-pipeline_outputs.tar ITS-pipeline_outputs 2>/dev/null || true
@@ -82,24 +83,26 @@ else
 fi
 
 # Find reads dir and resolve inputs
+print_section "Reads"
 resolve_reads_dir reads || exit 1
 read_path="${reads_dir}"
+echo "reads: $read_path"
+ls $read_path
 
 # Validate metadata against reads
-echo "Validating metadata..."
+print_section "Metadata check"
 if ! bash ./validate_metadata.sh "$read_path"; then
     trap - EXIT
     exit 1
 fi
 
+print_section "Settings"
 print_args "${args[@]}"
-echo "reads: $read_path"
-ls $read_path
 
 pattern+=$(ls -1 $read_path/*_R1* 2>/dev/null | head -1 | sed 's/.*_R1//')
 cd ITS-pipeline-app-v2.0/
 
-echo "Executing Nextflow run" 
+print_section "Nextflow run"
 ./nextflow run ./src/main.nf --reads "$read_path/$pattern" ${args[*]}
 nextflow_exit_code=$?
 

@@ -134,7 +134,6 @@ resolve_reads_dir() {
         [ -f "$tarball" ] || tarball=$(find "$input" -maxdepth 1 -type f \( -name "*.tar" -o -name "*.tar.gz" -o -name "*.tgz" \) ! -name "nextflow_work_debug.tar" | head -1)
         if [ -n "$tarball" ]; then
             echo "Unpacking $(basename "$tarball")"
-            echo ""
             tar -xf "$tarball" -C "$input" --warning=no-unknown-keyword && rm -f "$tarball"
         fi
     fi
@@ -143,12 +142,16 @@ resolve_reads_dir() {
     r1_file=$(find "$input" -type f -name "$pattern" | head -1)
     if [ -z "$r1_file" ]; then
         echo "ERROR: No read files ($pattern) found in $input"
-        echo ""
         return 1
     fi
     reads_dir=$(cd "$(dirname "$r1_file")" && pwd)
     echo "Reads folder: $reads_dir"
+}
+
+# Print a blank line and a section header to separate parts of the job log
+print_section() {
     echo ""
+    echo "==== $1 ===="
 }
 
 # Print each flag with its value(s) on its own line
@@ -178,3 +181,4 @@ export -f complete_job
 export -f fail_job
 export -f resolve_reads_dir
 export -f print_args
+export -f print_section

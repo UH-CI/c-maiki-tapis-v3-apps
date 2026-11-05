@@ -11,7 +11,8 @@ setup_tapis_job
 
 cleanup() {
     cd 16S-pipeline-app-v0.0.2 2>/dev/null
-    
+
+    print_section "Cleanup"
     echo "Compressing output folders"
     tar -cf ../nextflow_work_debug.tar work conf/hpc.config conf/container.config src/nextflow.config .nextflow .nextflow.log -C .. tapisjob.env 2>/dev/null || true
 
@@ -127,18 +128,21 @@ fi
 cd ../
 
 # Find reads dir and resolve inputs
+print_section "Reads"
 resolve_reads_dir reads || exit 1
 read_dir="${reads_dir}/"
 read_path="${reads_dir}/${suffix}"
+echo "reads: $read_path"
+ls $read_dir
 
 # Validate metadata against reads
-echo "Validating metadata..."
+print_section "Metadata check"
 if ! bash ./validate_metadata.sh "$read_dir"; then
     trap - EXIT
     exit 1
 fi
 
-cd 16S-pipeline-app-v0.0.2 
+cd 16S-pipeline-app-v0.0.2
 
 args=(-profile "${conf}" "${args[@]}")
 
@@ -146,14 +150,10 @@ args=(-profile "${conf}" "${args[@]}")
 args+=("--referenceAln" "${PWD}/${db_aln}")
 args+=("--referenceTax" "${PWD}/${db_tax}")
 
-echo ""
+print_section "Settings"
 print_args "${args[@]}"
-echo ""
-echo "reads: $read_path"
-ls $read_dir
-echo ""
 
-echo "Executing Nextflow run" 
+print_section "Nextflow run"
 ./nf/nextflow run src/main.nf --reads "$read_path" ${args[*]}
 nextflow_exit_code=$?
 

@@ -46,15 +46,15 @@ args=(
 [[ "$reverseComplement" -eq 1 ]] && args+=(--reverseComplement)
 [[ "$singleBarcoded" -eq 1 ]] && args+=(--singleBarcoded)
 
+print_section "Settings"
 print_args "${args[@]}"
 
 read_path="${PWD}/reads"
 echo "read_path: $read_path"
-echo ""
 
 cd demux-app-v1.0/
 
-echo "Executing Nextflow run" 
+print_section "Nextflow run"
 # Capture the nextflow exit code immediately
 ./nextflow run src/main.nf --inputdir "$read_path" ${args[*]}
 nextflow_exit_code=$?
@@ -66,6 +66,7 @@ else
     echo "Run failed with exit code $nextflow_exit_code"
 fi
 
+print_section "Cleanup"
 echo "Compressing output folders"
 mv demultiplexed/*.html .
 tar -cf nextflow_work_debug.tar work ./conf/${conf}.config ./src/nextflow.config .nextflow.log  -C .. tapisjob.env
