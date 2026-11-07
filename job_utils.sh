@@ -115,11 +115,14 @@ fail_job() {
 }
 
 # Find the reads dir and untar tarball if needed
-# Sets reads_dir to the absolute path of the folder holding the forward read files
+# Sets reads_dir to the absolute path of the folder holding the forward read files.
+# With multiple sequencing runs (3rd argument = 1), sets reads_dir to the folder
+# holding one subfolder per run, as ampliseq --multiple_sequencing_runs expects.
 resolve_reads_dir() {
     local input="${1:-reads}"
     local pattern="${2:-*_R1*.fastq*}"
-    local tarball r1_file
+    local multiple_runs="${3:-0}"
+    local tarball r1_file run_dirs run_count parent_dirs parent_count
 
     # If input is a single file, move it into a folder of the same name
     if [ -f "$input" ]; then
@@ -144,6 +147,33 @@ resolve_reads_dir() {
         echo "ERROR: No read files ($pattern) found in $input"
         return 1
     fi
+
+    if [ "$multiple_runs" -eq 1 ]; then
+        # Each folder holding R1 reads is one sequencing run
+        run_dirs=$(find "$input" -type f -name "$pattern" -exec dirname {} \; | sort -u)
+        run_count=$(( $(printf '%s\n' "$run_dirs" | wc -l) ))
+        if [ "$run_count" -lt 2 ]; then
+            echo "ERROR: Multiple sequencing runs is on, but all read files are in one folder: $run_dirs"
+            echo "Put each run's read files in its own folder, e.g. runA/ and runB/"
+            return 1
+        fi
+
+        # Run folders must sit side by side in one parent folder, with no reads loose beside them
+        parent_dirs=$(while IFS= read -r d; do dirname "$d"; done <<< "$run_dirs" | sort -u)
+        parent_count=$(( $(printf '%s\n' "$parent_dirs" | wc -l) ))
+        if [ "$parent_count" -ne 1 ]; then
+            echo "ERROR: Run folders must sit side by side in one folder, with no read files loose next to them."
+            echo "Read files were found in:"
+            printf '%s\n' "$run_dirs" | sed 's/^/  /'
+            return 1
+        fi
+
+        reads_dir=$(cd "$parent_dirs" && pwd)
+        echo "Reads folder: $reads_dir"
+        echo "Run folders: $(while IFS= read -r d; do basename "$d"; done <<< "$run_dirs" | tr '\n' ' ')"
+        return 0
+    fi
+
     reads_dir=$(cd "$(dirname "$r1_file")" && pwd)
     echo "Reads folder: $reads_dir"
 }

@@ -124,7 +124,7 @@ fi
 # Forward read pattern from extension
 read_pattern=$(echo "${extension##*/}" | sed 's/{\([^,}]*\),[^}]*}/\1/')
 print_section "Reads"
-resolve_reads_dir reads "$read_pattern" || exit 1
+resolve_reads_dir reads "$read_pattern" "${multiple_sequencing_runs:-0}" || exit 1
 read_path="${reads_dir}"
 echo "read_path: $read_path"
 ls $read_path
