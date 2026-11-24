@@ -39,7 +39,8 @@ process DADA2_ASSIGN_TAXONOMY {
         setNames(seq, seq_ids), "$db",
         minBoot=$params.tax_confidence,
         tryRC=TRUE,
-        outputBootstraps=TRUE
+        outputBootstraps=TRUE,
+        multithread=TRUE
     )
     taxa = cbind(seq_ids, assignments\$tax)
     write.table(taxa, "taxonomy_${otu_id}.csv", quote=F, row.names=F, sep=",")
