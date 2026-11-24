@@ -144,7 +144,7 @@ INPUT_FASTQ_PREFILT = INPUT_FASTQ.filter{it[1][0].countFastq()>params.minReads}
 process FilterAndTrim {
     // Quality filter and trimming using dada2
     tag { "FilterAndTrim.${pairId}" }
-    label "medium_computation"
+    label "low_computation"
     label "r_script"
     publishDir params.outdir+"Misc/1-FilterAndTrim", mode: "copy", pattern: "*.{fastq.gz,png}"
 
@@ -191,7 +191,7 @@ FILTERED_COUNTS = FASTQ_TRIMMED_FOR_COUNT.collect{ ["'${it[0]}': ${it[1][0].coun
 
 process LearnErrors {
     tag { "LearnErrors.${pairId}" }
-    label "medium_computation"
+    label "low_computation"
     label "r_script"
     publishDir params.outdir+"Misc/2-ErrorModel", mode: "copy", pattern: "*.{RDS,png}"
 
@@ -220,7 +220,7 @@ process LearnErrors {
 
 process Denoise {
     tag { "Denoising.${pairId}" }
-    label "medium_computation"
+    label "low_computation"
     label "r_script"
     publishDir params.outdir+"Misc/3-Denoising", mode: "copy", pattern: "*.RDS"
 
@@ -322,7 +322,7 @@ process MultipleSequenceAlignment {
 
 process ChimeraRemoval {
     tag { "chimeraRemoval" }
-    label "high_computation"
+    label "medium_computation"
     label "mothur_script"
     publishDir params.outdir+"Misc/6-ChimeraRemoval", mode: "copy", pattern: "*.{fasta,count_table}"
     publishDir params.outdir+"Results/raw/details", mode: "copy", pattern: "raw*.fasta"
@@ -344,7 +344,7 @@ process ChimeraRemoval {
 
 process PreClassification {
     tag { "preClassification" }
-    label "high_computation"
+    label "medium_computation"
     label "mothur_script"
     publishDir params.outdir+"Misc/7-PreClassification", mode: "copy", pattern: "*.taxonomy"
 
@@ -373,7 +373,7 @@ process PreClassification {
 
 process Clustering {
     tag { "clustering.${idThreshold}" }
-    label "high_computation"
+    label "medium_computation"
     label "mothur_script"
     publishDir params.outdir+"Misc/8-Clustering", mode: "copy", pattern: "raw.*"
     publishDir params.outdir+"Results/raw/details", mode: "copy", pattern: "raw*.{shared,fasta,taxonomy}"
@@ -423,7 +423,7 @@ process Clustering {
 
 process TaxaFilter {
     tag { "taxaFilter.${idThreshold}" }
-    label "medium_computation"
+    label "low_computation"
     label "mothur_script"
     publishDir params.outdir+"Misc/9-TaxaFilter", mode: "copy"
 
@@ -447,7 +447,7 @@ process TaxaFilter {
 
 process MultipletonsFilter {
     tag { "MultipletonsFilter.${idThreshold}" }
-    label "medium_computation"
+    label "low_computation"
     label "mothur_script"
     publishDir params.outdir+"Misc/10-MultipletonsFilter", mode: "copy"
 
@@ -500,7 +500,7 @@ process GetSubsamlingValue {
 
 process Subsampling {
     tag { "subsampling" }
-    label "medium_computation"
+    label "low_computation"
     label "mothur_script"
     publishDir params.outdir+"Misc/11-Subsampling", mode: "copy"
 
@@ -536,7 +536,7 @@ SUBSAMPLED_ALL.map{it -> [it[0], it[1][0], it[1][1], it[1][3]]}.set{SUBSAMPLED_N
 
 process PreLulu {
     tag { "preLulus.${idThreshold}" }
-    label "medium_computation"
+    label "low_computation"
     label "mothur_script"
     publishDir params.outdir+"Misc/12-Lulu", mode: "copy"
 
@@ -574,7 +574,7 @@ process PreLulu {
 
 process Lulu {
     tag { "Lulu.${idThreshold}" }
-    label "high_computation"
+    label "low_computation"
     label "r_script"
     publishDir params.outdir+"Misc/12-Lulu", mode: "copy"
 
@@ -605,7 +605,7 @@ process Lulu {
 
 process Database {
     tag { "database" }
-    label "high_computation"
+    label "low_computation"
     label "mothur_script"
     publishDir params.outdir+"Results/main/details", mode: "copy", pattern: "*.{taxonomy,shared,fasta,relabund}"
     publishDir params.outdir+"Results/main", mode: "copy", pattern: "*.{database,biom}"	
@@ -665,7 +665,7 @@ process Database {
 
 process SummaryPlot {
     tag { "SummaryPlot.${idThreshold}" }
-    label "medium_computation"
+    label "low_computation"
     label "python_script"
     publishDir params.outdir+"Results/figures", mode:"copy", pattern:"*.html"
 
@@ -688,7 +688,7 @@ process SummaryPlot {
 
 process SummaryFile {
     tag { "SummaryFile" }
-    label "medium_computation"
+    label "low_computation"
     label "python_script"
     publishDir params.outdir+"Results", mode: "copy"
 
@@ -745,7 +745,7 @@ process SummaryFile {
 
 process FastTree {
     tag { "FastTree_${idThreshold}" }
-    label "high_computation"
+    label "low_computation"
     // label "mothur_script"
     publishDir params.outdir+"Results/postprocessing/unifrac", mode: "copy", pattern: "*.nwk"
 
@@ -764,7 +764,7 @@ process FastTree {
 
 process UnifracDistPhylo {
     tag { "Unifrac_${idThreshold}_${mode}" }
-    label "high_computation"
+    label "medium_computation"
     label "r_script"
     publishDir params.outdir+"Results/postprocessing/unifrac", mode: "copy", pattern: "*.csv"
 
@@ -786,7 +786,7 @@ process UnifracDistPhylo {
 
 process UnifracDistMothur {
     tag { "Unifrac_${idThreshold}_${mode}" }
-    label "high_computation"
+    label "medium_computation"
     label "r_script"
     publishDir params.outdir+"Results/postprocessing/unifrac", mode: "copy", pattern: "*{.nwk,summary}"
 
@@ -810,7 +810,7 @@ process UnifracDistMothur {
 
 process AlphaDiv {
     tag { "alphaDiv_${idThreshold}" }
-    label "high_computation"
+    label "low_computation"
     label "mothur_script"
     publishDir params.outdir+"Results/postprocessing/alpha_diversity", mode: "copy", pattern: "*.summary"
 
@@ -830,7 +830,7 @@ process AlphaDiv {
 
 process BetaDiv {
     tag { "betaDiv_${idThreshold}" }
-    label "high_computation"
+    label "low_computation"
     label "mothur_script"
     publishDir params.outdir+"Results/postprocessing/beta_diversity", mode: "copy", pattern: "*.summary"
 
@@ -850,7 +850,7 @@ process BetaDiv {
 
 process SpeciesAssignment {
     tag { "species_${idThreshold}" }
-    label "high_computation"
+    label "highmem_computation"
     label "r_script"
     publishDir params.outdir+"Results/postprocessing/", mode: "copy", pattern: "*.csv"
 
